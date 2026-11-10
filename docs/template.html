@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Raytraced Population Atlas</title>
+<meta name="description" content="Path-traced 3D population maps from Kontur H3 data, with election results draped on population, and the full pipeline to make your own.">
+<meta property="og:title" content="Raytraced Population Atlas">
+<meta property="og:description" content="Every inhabited hexagon extruded by its people per km² and path-traced in Blender. Real data, real shadows.">
+<meta property="og:image" content="img/texas.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112,500;112,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column (~68ch) that widens for map plates; the five density swatches act as the page's rule. */
+:root{
+  --paper:#F2EEE8; --plate:#FBF8F3; --ink:#2A221C; --muted:#6C5F53; --rule:#DCD2C4; --code:#E9E2D7;
+  --red:#C9252C; --blue:#1F5BD6;
+  --f-display:"Archivo","Inter",system-ui,sans-serif; --f-body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#16120F;--plate:#1E1915;--ink:#EEE6DB;--muted:#A99A8B;--rule:#352C25;--code:#221C17;--red:#F0575C;--blue:#7AA2FF;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#16120F;--plate:#1E1915;--ink:#EEE6DB;--muted:#A99A8B;--rule:#352C25;--code:#221C17;--red:#F0575C;--blue:#7AA2FF;color-scheme:dark}
+*{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.6 var(--f-body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+img{max-width:100%}
+.wrap{max-width:1120px;margin:0 auto;padding-block:48px 96px;display:flex;flex-direction:column;gap:72px}
+.col{max-width:68ch}
+h1,h2,h3{font-family:var(--f-display);font-stretch:112%;text-wrap:balance;margin:0;line-height:1.1}
+h1{font-weight:800;font-size:clamp(2.2rem,5.5vw,3.8rem);letter-spacing:-.01em}
+h2{font-weight:800;font-size:clamp(1.5rem,3vw,2.1rem)}
+h3{font-weight:500;font-size:1.15rem}
+p{margin:0}
+.stack{display:flex;flex-direction:column;gap:16px}
+.eyebrow{font:500 .75rem/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.lede{font-size:1.15rem}
+.muted{color:var(--muted)}
+.small{font-size:.88rem}
+a{color:var(--blue);text-underline-offset:3px}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:2px}
+code{font:400 .88em var(--f-mono);background:var(--code);padding:.1em .35em;border-radius:3px}
+.ramp{display:flex;gap:3px;align-items:flex-end;height:26px;max-width:260px}
+.ramp i{flex:1;border-radius:1px}
+.ramp i:nth-child(1){background:#D7262A;height:30%}.ramp i:nth-child(2){background:#E85442;height:47%}.ramp i:nth-child(3){background:#FAF6F0;height:64%;outline:1px solid var(--rule);outline-offset:-1px}.ramp i:nth-child(4){background:#A9C8EE;height:82%}.ramp i:nth-child(5){background:#1F5BD6;height:100%}
+.ramp-labels{display:flex;max-width:260px;justify-content:space-between;font:500 .72rem/1 var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:48px;align-items:center}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:6px 20px;font-size:.92rem;margin:0}
+.facts dt{font:500 .75rem/1.9 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.facts dd{margin:0}
+.plate{background:var(--plate);border:1px solid var(--rule);border-radius:4px;padding:10px;display:block}
+.plate img{display:block;width:100%;height:auto;border-radius:2px}
+.gallery{columns:2 320px;column-gap:28px}
+.gallery figure{break-inside:avoid;margin:0 0 28px;display:flex;flex-direction:column;gap:10px}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 16px;font-size:.88rem;color:var(--muted)}
+figcaption b{color:var(--ink);font-weight:600}
+.num{font-variant-numeric:tabular-nums}
+.timeline{display:flex;flex-direction:column;gap:40px;counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:28px;align-items:start}
+.step .stack{gap:10px}
+.step h3::before{counter-increment:step;content:counter(step,decimal-leading-zero) "  ";font:500 .8rem var(--f-mono);color:var(--red);letter-spacing:.06em}
+.ask{border-left:3px solid var(--rule);padding-left:12px;color:var(--muted);font-style:italic}
+ul.tight{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px}
+.tbl{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{text-align:left;padding:9px 14px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font:500 .72rem/1.4 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--plate)}
+tr:last-child td{border-bottom:0}
+td.r,th.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.sum td{font-weight:600}
+pre{margin:0;background:var(--code);border-radius:4px;padding:14px 16px;overflow-x:auto;font:400 .8rem/1.55 var(--f-mono);color:var(--ink)}
+.cmd{display:flex;flex-direction:column;gap:8px;min-width:0}
+details{border:1px solid var(--rule);border-radius:4px;background:var(--plate)}
+summary{cursor:pointer;padding:12px 16px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;align-items:center;font:500 .9rem var(--f-mono)}
+summary span{font:400 .82rem var(--f-body);color:var(--muted)}
+details[open] summary{border-bottom:1px solid var(--rule)}
+.codebox{position:relative;padding:12px}
+.codebox pre{max-height:520px}
+.copy{position:absolute;top:20px;right:22px;font:500 .75rem var(--f-mono);background:var(--plate);color:var(--ink);border:1px solid var(--rule);border-radius:3px;padding:4px 10px;cursor:pointer}
+.copy:hover{border-color:var(--muted)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
+.card{border-top:3px solid var(--red);padding-top:12px;display:flex;flex-direction:column;gap:6px}
+.card.b{border-top-color:var(--blue)}
+.card p{font-size:.93rem}
+.prompt{border:1px solid var(--rule);border-radius:4px;background:var(--plate);padding:16px;display:flex;flex-direction:column;gap:10px;position:relative}
+.prompt pre{white-space:pre-wrap}
+@media (max-width:820px){.hero,.step,.grid2{grid-template-columns:minmax(0,1fr)}.step .plate{max-width:420px}}
+@media (prefers-reduced-motion:no-preference){.plate img{transition:transform .25s}.plate:hover img{transform:scale(1.01)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hero">
+  <div class="stack">
+    <span class="eyebrow">Kontur Population · Blender Cycles</span>
+    <h1>Raytraced Population Atlas</h1>
+    <p class="lede">Population maps where every inhabited H3 hexagon is extruded by its people per km², then path-traced under a low western sun. The heights come straight from the data, and every shadow is cast by the real geometry.</p>
+    <div class="stack" style="gap:6px">
+      <div class="ramp" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="ramp-labels"><span>≤1</span><span>10</span><span>100</span><span>1k</span><span>10k+</span></div>
+      <span class="muted" style="font-size:.82rem">people / km², one step per 10×, the same scale on every density map</span>
+    </div>
+    <dl class="facts">
+      <dt>Data</dt><dd>Kontur Population, 2023-11-01 release (CC BY 4.0), H3 resolution 8 (~0.7 km²)</dd>
+      <dt>Renderer</dt><dd>Blender 5.2 Cycles as a Python module (<code>bpy</code>), 64 samples, OpenImageDenoise</dd>
+      <dt>View</dt><dd>Plan oblique: true top-down footprint, peaks rising at a 50° view angle</dd>
+      <dt>Light</dt><dd>Sun 15° above the horizon from azimuth 282°, plus a faint blue sky fill</dd>
+      <dt>Code</dt><dd><a href="https://github.com/stamen/prompted-population-maps">github.com/stamen/prompted-population-maps</a></dd>
+    </dl>
+  </div>
+  <a class="plate" href="full/texas.jpg" target="_blank" rel="noopener"><img src="img/texas.jpg" alt="Texas population density, raytraced 3D hexagon map"></a>
+</header>
+
+<section class="stack" style="gap:28px">
+  <div class="stack col">
+    <span class="eyebrow">Population density</span>
+    <h2>Eight maps, one pipeline</h2>
+    <p class="muted">Click a map for the full 3600-pixel image. Heights are linear and normalised to each map's densest cell, so compare colours across maps, not heights.</p>
+  </div>
+  <div class="gallery">
+<!--GALLERY-->
+  </div>
+</section>
+
+<section class="stack" style="gap:28px">
+  <div class="stack col">
+    <span class="eyebrow">Votes on population</span>
+    <h2>Election results draped on the same spikes</h2>
+    <p class="muted">The height is still people per km². The colour is the two-party margin of the county or precinct each hexagon falls in, from R+60 (dark red) to D+60 (dark blue), so the tall spikes show where the votes were cast.</p>
+  </div>
+  <div class="gallery">
+<!--ELECTION-->
+  </div>
+  <p class="col muted small">2026 Senate: unofficial county returns compiled on Wikipedia (retrieved 10 Nov 2026), spot-checked against Decision Desk HQ and the Dallas Morning News; statewide precinct results were not yet published. 2024 presidential: The New York Times precinct results with official boundaries, used under the NYT non-commercial data agreement.</p>
+</section>
+
+<section class="stack" style="gap:28px">
+  <div class="stack col">
+    <span class="eyebrow">How we got here</span>
+    <h2>Texas, prompt by prompt</h2>
+    <p class="muted">The style was developed on Texas through a conversation with an AI coding agent. Each step shows the image, what was asked for, and what changed in the code.</p>
+  </div>
+  <div class="timeline">
+<!--TIMELINE-->
+  </div>
+</section>
+
+<section class="stack" style="gap:28px">
+  <div class="stack col">
+    <span class="eyebrow">Pick up where we left off</span>
+    <h2>Make your own map</h2>
+    <p>Clone the repo and either hand it to your own coding agent, or run the commands yourself. <code>AGENTS.md</code> tells any LLM (Claude, Codex, Gemini, Cursor and others) how the pipeline works, what not to break, and how to check its work.</p>
+  </div>
+  <div class="prompt">
+    <span class="eyebrow">A prompt for your agent</span>
+    <button class="copy" type="button" style="top:12px;right:12px">Copy</button>
+    <pre>Clone https://github.com/stamen/prompted-population-maps and read AGENTS.md.
+Set up the environment, then make a population density map of Japan in the same style:
+add a region entry, render a preview, show it to me, and check the population total
+against the official figure before rendering the final.</pre>
+  </div>
+  <div class="grid2">
+    <div class="cmd">
+      <h3>Set up once</h3>
+      <pre>git clone https://github.com/stamen/prompted-population-maps
+cd prompted-population-maps
+uv venv -p 3.13 renv
+uv pip install -p renv/bin/python -r requirements.txt
+export PYTHON=renv/bin/python
+pipeline/fetch_data.sh US DE        # ISO-2 codes you need</pre>
+      <p class="muted small">Blender installs from PyPI as <code>bpy</code>; no Blender app needed. Kontur files come from Kontur's public S3 bucket; boundaries from Natural Earth and the US Census.</p>
+    </div>
+    <div class="cmd">
+      <h3>Make a map</h3>
+      <pre>pipeline/make_map.sh germany preview   # ~30 s
+pipeline/make_map.sh germany final     # 6–15 min
+python docs/build_site.py              # refresh this site</pre>
+      <p class="muted small">Previews are 800 px at 16 samples; finals are 3600 px at 64 samples on 4 CPU cores. Iterate on previews, render the final once.</p>
+    </div>
+  </div>
+  <div class="stack">
+    <h3>Where each style setting lives</h3>
+    <div class="tbl"><table>
+      <tr><th>To change</th><th>File</th><th>Look for</th></tr>
+      <tr><td>A region, its cities, its data</td><td>pipeline/regions.py</td><td>one entry in <code>R</code></td></tr>
+      <tr><td>Sun height and direction</td><td>pipeline/regions.py</td><td><code>SUN_EL</code>, <code>SUN_AZ</code>. Lower elevation means longer shadows</td></tr>
+      <tr><td>Density colour ramp</td><td>pipeline/render.py, pipeline/legend_render.py</td><td><code>stops</code>, <code>cols</code>. Change both, then re-run legend_render.py</td></tr>
+      <tr><td>Election colour ramp</td><td>pipeline/regions.py</td><td><code>EL_STOPS</code>, <code>EL_COLS</code></td></tr>
+      <tr><td>Height exaggeration</td><td>pipeline/render.py</td><td><code>HMAX=0.224*S</code> (S = region extent in km)</td></tr>
+      <tr><td>View tilt</td><td>pipeline/render.py, pipeline/legend_render.py</td><td><code>tilt</code>; <code>pixel_aspect_x = 1/cos(tilt)</code> gives the plan-oblique view</td></tr>
+      <tr><td>Ground and uninhabited land colour</td><td>pipeline/render.py</td><td><code>mat('ground', …)</code>, <code>slabm</code></td></tr>
+      <tr><td>Brightness, contrast, saturation</td><td>pipeline/annotate.py</td><td><code>grade()</code>; the white point is measured from the bare ground</td></tr>
+      <tr><td>Title, legend, callouts, labels</td><td>pipeline/annotate.py</td><td>text blocks; label pills and collision list <code>taken</code></td></tr>
+      <tr><td>Margins and framing</td><td>pipeline/render.py</td><td><code>fx0, fx1, fy0, fy1</code>. Extra room on the east is for shadows</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<section class="stack" style="gap:28px">
+  <div class="stack col">
+    <span class="eyebrow">Lessons</span>
+    <h2>Things that will bite you</h2>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>The densest cell is a needle</h3><p>A city's densest hexagon is one pixel wide and towers over the visible skyline. Labels anchor on the 25th-tallest cell nearby instead, which is where the eye sees the city.</p></div>
+    <div class="card b"><h3>H3 cells are not always hexagons</h3><p>Resolution-7 cells that straddle an icosahedron face edge carry up to 10 boundary vertices. <code>prep.py</code> keeps the six sharpest corners; pentagons are padded to six.</p></div>
+    <div class="card"><h3>Lakes need two polygons</h3><p>Clip the population with the full provincial boundary and build the land from the lake-cut shape. Clipping data with 1:10m lake shorelines dropped 780,000 Ontario lakeshore residents.</p></div>
+    <div class="card b"><h3>Legend colours must be rendered</h3><p>Lighting and tone mapping change how each colour looks. The swatches are flat tiles rendered under the identical sun and sky, then put through the same grade as the map.</p></div>
+    <div class="card"><h3>Dense countries look different</h3><p>Germany, the UK and India are blue almost everywhere because rural density is in the hundreds per km². England's 99th-percentile cell is a quarter of its maximum, so its field is uniformly tall. That is the data.</p></div>
+    <div class="card b"><h3>Check totals, and check sources</h3><p><code>prep.py</code> prints the population it kept: Texas 29.95M, Germany 83.5M, India 1.43B, China 1.43B all match official figures. Election totals were checked against certified or independently reported numbers.</p></div>
+  </div>
+</section>
+
+<section class="stack" style="gap:28px">
+  <div class="stack col">
+    <span class="eyebrow">Cost</span>
+    <h2>What it took</h2>
+    <p class="muted">Everything here was made in one long session with an AI coding agent. The measured totals come from the session's usage record; the per-phase split is an estimate made during the work.</p>
+  </div>
+  <div class="grid2">
+    <div class="stack" style="gap:10px">
+      <h3>Measured, whole session</h3>
+      <div class="tbl"><table><tr><th>Metric</th><th class="r">Value</th></tr><!--MEASURED--></table></div>
+      <p class="muted small">As of <!--MEASURED_AT-->. Cache reads dominate: every tool call re-reads the conversation so far.</p>
+    </div>
+    <div class="stack" style="gap:10px">
+      <h3>Estimated by phase</h3>
+      <div class="tbl"><table><tr><th>Phase</th><th class="r">New tokens</th></tr><!--COST--></table></div>
+    </div>
+  </div>
+  <p class="col muted small">The first map took about a third of the session. Once the pipeline was general, a new region cost about 2k new tokens (one config entry plus reviewing one preview) and 6–15 minutes of rendering.</p>
+</section>
+
+<section class="stack" style="gap:20px">
+  <div class="stack col">
+    <span class="eyebrow">Source</span>
+    <h2>The code</h2>
+    <p class="muted">The same files as in the repository, shown here for reading.</p>
+  </div>
+<!--CODE-->
+  <p class="muted small">Code MIT licensed. Data © Kontur (CC BY 4.0), Natural Earth (public domain), US Census Bureau (public domain), The New York Times (non-commercial). Fonts: Inter (SIL OFL 1.1). Rendered with Blender (GPL).</p>
+</section>
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(function(b){
+  b.addEventListener('click',function(){
+    var pre=b.parentNode.querySelector('pre'); var t=pre.textContent;
+    function sel(){var r=document.createRange();r.selectNodeContents(pre);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Selected, press Ctrl+C';}
+    try{navigator.clipboard.writeText(t).then(function(){b.textContent='Copied';setTimeout(function(){b.textContent='Copy'},1600)},sel)}catch(e){sel()}
+  });
+});
+</script>
+</body>
+</html>
