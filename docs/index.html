@@ -1,0 +1,799 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Raytraced Population Atlas</title>
+<meta name="description" content="Path-traced 3D population maps from Kontur H3 data, with election results draped on population, and the full pipeline to make your own.">
+<meta property="og:title" content="Raytraced Population Atlas">
+<meta property="og:description" content="Every inhabited hexagon extruded by its people per km² and path-traced in Blender. Real data, real shadows.">
+<meta property="og:image" content="img/texas.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112,500;112,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column (~68ch) that widens for map plates; the five density swatches act as the page's rule. */
+:root{
+  --paper:#F2EEE8; --plate:#FBF8F3; --ink:#2A221C; --muted:#6C5F53; --rule:#DCD2C4; --code:#E9E2D7;
+  --red:#C9252C; --blue:#1F5BD6;
+  --f-display:"Archivo","Inter",system-ui,sans-serif; --f-body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#16120F;--plate:#1E1915;--ink:#EEE6DB;--muted:#A99A8B;--rule:#352C25;--code:#221C17;--red:#F0575C;--blue:#7AA2FF;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#16120F;--plate:#1E1915;--ink:#EEE6DB;--muted:#A99A8B;--rule:#352C25;--code:#221C17;--red:#F0575C;--blue:#7AA2FF;color-scheme:dark}
+*{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.6 var(--f-body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+img{max-width:100%}
+.wrap{max-width:1120px;margin:0 auto;padding-block:48px 96px;display:flex;flex-direction:column;gap:72px}
+.col{max-width:68ch}
+h1,h2,h3{font-family:var(--f-display);font-stretch:112%;text-wrap:balance;margin:0;line-height:1.1}
+h1{font-weight:800;font-size:clamp(2.2rem,5.5vw,3.8rem);letter-spacing:-.01em}
+h2{font-weight:800;font-size:clamp(1.5rem,3vw,2.1rem)}
+h3{font-weight:500;font-size:1.15rem}
+p{margin:0}
+.stack{display:flex;flex-direction:column;gap:16px}
+.eyebrow{font:500 .75rem/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.lede{font-size:1.15rem}
+.muted{color:var(--muted)}
+.small{font-size:.88rem}
+a{color:var(--blue);text-underline-offset:3px}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:2px}
+code{font:400 .88em var(--f-mono);background:var(--code);padding:.1em .35em;border-radius:3px}
+.ramp{display:flex;gap:3px;align-items:flex-end;height:26px;max-width:260px}
+.ramp i{flex:1;border-radius:1px}
+.ramp i:nth-child(1){background:#D7262A;height:30%}.ramp i:nth-child(2){background:#E85442;height:47%}.ramp i:nth-child(3){background:#FAF6F0;height:64%;outline:1px solid var(--rule);outline-offset:-1px}.ramp i:nth-child(4){background:#A9C8EE;height:82%}.ramp i:nth-child(5){background:#1F5BD6;height:100%}
+.ramp-labels{display:flex;max-width:260px;justify-content:space-between;font:500 .72rem/1 var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:48px;align-items:center}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:6px 20px;font-size:.92rem;margin:0}
+.facts dt{font:500 .75rem/1.9 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.facts dd{margin:0}
+.plate{background:var(--plate);border:1px solid var(--rule);border-radius:4px;padding:10px;display:block}
+.plate img{display:block;width:100%;height:auto;border-radius:2px}
+.gallery{columns:2 320px;column-gap:28px}
+.gallery figure{break-inside:avoid;margin:0 0 28px;display:flex;flex-direction:column;gap:10px}
+figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 16px;font-size:.88rem;color:var(--muted)}
+figcaption b{color:var(--ink);font-weight:600}
+.num{font-variant-numeric:tabular-nums}
+.timeline{display:flex;flex-direction:column;gap:40px;counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:28px;align-items:start}
+.step .stack{gap:10px}
+.step h3::before{counter-increment:step;content:counter(step,decimal-leading-zero) "  ";font:500 .8rem var(--f-mono);color:var(--red);letter-spacing:.06em}
+.ask{border-left:3px solid var(--rule);padding-left:12px;color:var(--muted);font-style:italic}
+ul.tight{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px}
+.tbl{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{text-align:left;padding:9px 14px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font:500 .72rem/1.4 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--plate)}
+tr:last-child td{border-bottom:0}
+td.r,th.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.sum td{font-weight:600}
+pre{margin:0;background:var(--code);border-radius:4px;padding:14px 16px;overflow-x:auto;font:400 .8rem/1.55 var(--f-mono);color:var(--ink)}
+.cmd{display:flex;flex-direction:column;gap:8px;min-width:0}
+details{border:1px solid var(--rule);border-radius:4px;background:var(--plate)}
+summary{cursor:pointer;padding:12px 16px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;align-items:center;font:500 .9rem var(--f-mono)}
+summary span{font:400 .82rem var(--f-body);color:var(--muted)}
+details[open] summary{border-bottom:1px solid var(--rule)}
+.codebox{position:relative;padding:12px}
+.codebox pre{max-height:520px}
+.copy{position:absolute;top:20px;right:22px;font:500 .75rem var(--f-mono);background:var(--plate);color:var(--ink);border:1px solid var(--rule);border-radius:3px;padding:4px 10px;cursor:pointer}
+.copy:hover{border-color:var(--muted)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
+.card{border-top:3px solid var(--red);padding-top:12px;display:flex;flex-direction:column;gap:6px}
+.card.b{border-top-color:var(--blue)}
+.card p{font-size:.93rem}
+.prompt{border:1px solid var(--rule);border-radius:4px;background:var(--plate);padding:16px;display:flex;flex-direction:column;gap:10px;position:relative}
+.prompt pre{white-space:pre-wrap}
+@media (max-width:820px){.hero,.step,.grid2{grid-template-columns:minmax(0,1fr)}.step .plate{max-width:420px}}
+@media (prefers-reduced-motion:no-preference){.plate img{transition:transform .25s}.plate:hover img{transform:scale(1.01)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hero">
+  <div class="stack">
+    <span class="eyebrow">Kontur Population · Blender Cycles</span>
+    <h1>Raytraced Population Atlas</h1>
+    <p class="lede">Population maps where every inhabited H3 hexagon is extruded by its people per km², then path-traced under a low western sun. The heights come straight from the data, and every shadow is cast by the real geometry.</p>
+    <div class="stack" style="gap:6px">
+      <div class="ramp" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="ramp-labels"><span>≤1</span><span>10</span><span>100</span><span>1k</span><span>10k+</span></div>
+      <span class="muted" style="font-size:.82rem">people / km², one step per 10×, the same scale on every density map</span>
+    </div>
+    <dl class="facts">
+      <dt>Data</dt><dd>Kontur Population, 2023-11-01 release (CC BY 4.0), H3 resolution 8 (~0.7 km²)</dd>
+      <dt>Renderer</dt><dd>Blender 5.2 Cycles as a Python module (<code>bpy</code>), 64 samples, OpenImageDenoise</dd>
+      <dt>View</dt><dd>Plan oblique: true top-down footprint, peaks rising at a 50° view angle</dd>
+      <dt>Light</dt><dd>Sun 15° above the horizon from azimuth 282°, plus a faint blue sky fill</dd>
+      <dt>Code</dt><dd><a href="https://github.com/stamen/prompted-population-maps">github.com/stamen/prompted-population-maps</a></dd>
+    </dl>
+  </div>
+  <a class="plate" href="full/texas.jpg" target="_blank" rel="noopener"><img src="img/texas.jpg" alt="Texas population density, raytraced 3D hexagon map"></a>
+</header>
+
+<section class="stack" style="gap:28px">
+  <div class="stack col">
+    <span class="eyebrow">Population density</span>
+    <h2>Eight maps, one pipeline</h2>
+    <p class="muted">Click a map for the full 3600-pixel image. Heights are linear and normalised to each map's densest cell, so compare colours across maps, not heights.</p>
+  </div>
+  <div class="gallery">
+    <figure><a class="plate" href="full/texas.jpg" target="_blank" rel="noopener"><img src="img/texas.jpg" alt="Texas, raytraced 3D hexagon map" width="1600" height="1777" loading="lazy"></a>
+      <figcaption><b>Texas</b><span class="num">30.0 million · 317,903 cells · res 8 (~0.83 km²)</span></figcaption></figure>
+    <figure><a class="plate" href="full/new_york.jpg" target="_blank" rel="noopener"><img src="img/new_york.jpg" alt="New York State, raytraced 3D hexagon map" width="1600" height="1521" loading="lazy"></a>
+      <figcaption><b>New York State</b><span class="num">19.4 million · 119,773 cells · res 8 (~0.77 km²)</span></figcaption></figure>
+    <figure><a class="plate" href="full/ontario.jpg" target="_blank" rel="noopener"><img src="img/ontario.jpg" alt="Ontario, raytraced 3D hexagon map" width="1600" height="1974" loading="lazy"></a>
+      <figcaption><b>Ontario</b><span class="num">14.6 million · 126,617 cells · res 8 (~0.79 km²)</span></figcaption></figure>
+    <figure><a class="plate" href="full/uk.jpg" target="_blank" rel="noopener"><img src="img/uk.jpg" alt="United Kingdom, raytraced 3D hexagon map" width="1600" height="2227" loading="lazy"></a>
+      <figcaption><b>United Kingdom</b><span class="num">67.7 million · 224,223 cells · res 8 (~0.66 km²)</span></figcaption></figure>
+    <figure><a class="plate" href="full/france.jpg" target="_blank" rel="noopener"><img src="img/france.jpg" alt="France, raytraced 3D hexagon map" width="1600" height="1736" loading="lazy"></a>
+      <figcaption><b>France</b><span class="num">64.9 million · 595,906 cells · res 8 (~0.69 km²)</span></figcaption></figure>
+    <figure><a class="plate" href="full/germany.jpg" target="_blank" rel="noopener"><img src="img/germany.jpg" alt="Germany, raytraced 3D hexagon map" width="1600" height="2387" loading="lazy"></a>
+      <figcaption><b>Germany</b><span class="num">83.5 million · 363,457 cells · res 8 (~0.66 km²)</span></figcaption></figure>
+    <figure><a class="plate" href="full/india.jpg" target="_blank" rel="noopener"><img src="img/india.jpg" alt="India, raytraced 3D hexagon map" width="1600" height="1972" loading="lazy"></a>
+      <figcaption><b>India</b><span class="num">1.43 billion · 475,320 cells · res 7 (~5.24 km²)</span></figcaption></figure>
+    <figure><a class="plate" href="full/china.jpg" target="_blank" rel="noopener"><img src="img/china.jpg" alt="China, raytraced 3D hexagon map" width="1600" height="1693" loading="lazy"></a>
+      <figcaption><b>China</b><span class="num">1.43 billion · 821,724 cells · res 7 (~4.34 km²)</span></figcaption></figure>
+
+  </div>
+</section>
+
+<section class="stack" style="gap:28px">
+  <div class="stack col">
+    <span class="eyebrow">Votes on population</span>
+    <h2>Election results draped on the same spikes</h2>
+    <p class="muted">The height is still people per km². The colour is the two-party margin of the county or precinct each hexagon falls in, from R+60 (dark red) to D+60 (dark blue), so the tall spikes show where the votes were cast.</p>
+  </div>
+  <div class="gallery">
+    <figure><a class="plate" href="full/texas_senate.jpg" target="_blank" rel="noopener"><img src="img/texas_senate.jpg" alt="Texas 2026 U.S. Senate Results, raytraced 3D hexagon map" width="1600" height="1777" loading="lazy"></a>
+      <figcaption><b>Texas 2026 U.S. Senate Results</b><span class="num">county results · 317,903 cells</span></figcaption></figure>
+    <figure><a class="plate" href="full/texas_pres2024.jpg" target="_blank" rel="noopener"><img src="img/texas_pres2024.jpg" alt="Texas 2024 Presidential Results, raytraced 3D hexagon map" width="1600" height="1777" loading="lazy"></a>
+      <figcaption><b>Texas 2024 Presidential Results</b><span class="num">precinct results · 317,903 cells</span></figcaption></figure>
+
+  </div>
+  <p class="col muted small">2026 Senate: unofficial county returns compiled on Wikipedia (retrieved 10 Nov 2026), spot-checked against Decision Desk HQ and the Dallas Morning News; statewide precinct results were not yet published. 2024 presidential: The New York Times precinct results with official boundaries, used under the NYT non-commercial data agreement.</p>
+</section>
+
+<section class="stack" style="gap:28px">
+  <div class="stack col">
+    <span class="eyebrow">How we got here</span>
+    <h2>Texas, prompt by prompt</h2>
+    <p class="muted">The style was developed on Texas through a conversation with an AI coding agent. Each step shows the image, what was asked for, and what changed in the code.</p>
+  </div>
+  <div class="timeline">
+    <article class="step"><a class="plate" href="img/history/i0.jpg" target="_blank" rel="noopener"><img src="img/history/i0.jpg" alt="Texas map: first test render" width="800" height="640" loading="lazy"></a>
+      <div class="stack"><h3>First test render</h3><p class="ask">“Give me a population density map of Texas… extruded… dramatic raytraced shadows… red-white-blue. Use real data, and real shadows.”</p><p>An 800 px, 16-sample check of the pipeline: 317,903 Kontur hexagons became 2.2 million faces and path-traced in 8 seconds. Peaks were capped at 42 km and the base was light grey, so it read as flat and the white middle class blended into the base.</p></div></article>
+    <article class="step"><a class="plate" href="img/history/i1.jpg" target="_blank" rel="noopener"><img src="img/history/i1.jpg" alt="Texas map: first full render" width="1100" height="825" loading="lazy"></a>
+      <div class="stack"><h3>First full render</h3><p class="ask">“(first delivered map)”</p><p>Peaks raised to 110 km and the sun lowered to 7.5° from the west-northwest so shadows run east across the state. Charcoal base, grey ground, gradient legend, title “Where 30 million people live”.</p></div></article>
+    <article class="step"><a class="plate" href="img/history/i2.jpg" target="_blank" rel="noopener"><img src="img/history/i2.jpg" alt="Texas map: brighter, taller, warmer, labelled" width="1100" height="825" loading="lazy"></a>
+      <div class="stack"><h3>Brighter, taller, warmer, labelled</h3><p class="ask">“Trim the scale so the zero point is a brighter red and the top is a brighter blue… boost the vertical scale… lighten and warm up the background… add annotation for the major city spikes.”</p><p>Darkest ends of the ramp trimmed, peaks to 180 km, sand ground, twelve cities with leader lines and peak densities. Labels anchor on the visible skyline (25th-tallest nearby cell) because the densest cell is an invisible needle.</p></div></article>
+    <article class="step"><a class="plate" href="img/history/i3.jpg" target="_blank" rel="noopener"><img src="img/history/i3.jpg" alt="Texas map: uninhabited land in red" width="1100" height="825" loading="lazy"></a>
+      <div class="stack"><h3>Uninhabited land in red</h3><p class="ask">“The gray near-zero population background of the map should be red too.”</p><p>Kontur only lists inhabited hexagons, so empty land showed the base slab. The slab took the exact colour of the lowest class.</p></div></article>
+    <article class="step"><a class="plate" href="img/history/i4.jpg" target="_blank" rel="noopener"><img src="img/history/i4.jpg" alt="Texas map: names only, five swatches" width="1100" height="825" loading="lazy"></a>
+      <div class="stack"><h3>Names only, five swatches</h3><p class="ask">“Remove the density numbers… remove the leader lines… boost the vertical scale even more… simplify the legend into just 5 swatches.”</p><p>Peaks to 280 km (2.5× the first render), plain names on each skyline, five swatches at 1, 10, 100, 1,000 and 10,000+ people per km².</p></div></article>
+    <article class="step"><a class="plate" href="img/history/i5.jpg" target="_blank" rel="noopener"><img src="img/history/i5.jpg" alt="Texas map: plan oblique view" width="1100" height="1283" loading="lazy"></a>
+      <div class="stack"><h3>Plan oblique view</h3><p class="ask">“Stretch the image vertically so the image is closer to the proportions of Texas as viewed top down, but keep the perspective view.”</p><p>Blender renders with wide pixels (aspect 1/cos 50°): the ground keeps its top-down shape while heights still rise at the 50° view. Lighting is untouched and label positions come from Blender’s own camera projection.</p></div></article>
+    <article class="step"><a class="plate" href="img/history/i6.jpg" target="_blank" rel="noopener"><img src="img/history/i6.jpg" alt="Texas map: simpler title and a colour grade" width="1600" height="1866" loading="lazy"></a>
+      <div class="stack"><h3>Simpler title and a colour grade</h3><p class="ask">“Change the title to a simpler ‘Texas Population Density’… contrast, brightness, or other levels adjustments… bright and clean-looking.”</p><p>Levels put the sand near white, a gentle S-curve kept shadows strong, greys were neutralised and reds pulled back from neon. Legend swatches are rendered as flat tiles under the map’s lighting so they match after the grade.</p></div></article>
+    <article class="step"><a class="plate" href="img/history/i7.jpg" target="_blank" rel="noopener"><img src="img/history/i7.jpg" alt="Texas map: readable labels and a stepped legend" width="1100" height="1283" loading="lazy"></a>
+      <div class="stack"><h3>Readable labels and a stepped legend</h3><p class="ask">“The place labels need adjustment so they’re a bit easier to read. Also the scale needs an extra callout… or make each swatch a different height.”</p><p>Bold names on cream pills with a faint outline and shadow. The swatches rise one step per 10×, with callouts: darkest blue is 10,000× denser than darkest red, and heights are linear (the tallest spike’s real value is printed).</p></div></article>
+    <article class="step"><a class="plate" href="img/history/i8.jpg" target="_blank" rel="noopener"><img src="img/history/i8.jpg" alt="Texas map: 2026 senate results draped on population" width="1100" height="1221" loading="lazy"></a>
+      <div class="stack"><h3>2026 Senate results draped on population</h3><p class="ask">“Source county level election results from the 2026 Texas US Senate race and drape those colors on the population map instead of coloring by density.”</p><p>254-county results (Wikipedia, spot-checked against Decision Desk HQ and the Dallas Morning News). Each hexagon takes its county’s two-party margin; uninhabited land is neutral grey.</p></div></article>
+    <article class="step"><a class="plate" href="img/history/i9.jpg" target="_blank" rel="noopener"><img src="img/history/i9.jpg" alt="Texas map: county-coloured land" width="1100" height="1221" loading="lazy"></a>
+      <div class="stack"><h3>County-coloured land</h3><p class="ask">“In this case I would color the slab according the county election results, too.”</p><p>The land slab is built from the 254 Census county polygons, each in its result colour, so empty counties read correctly and spikes show where the votes are.</p></div></article>
+    <article class="step"><a class="plate" href="img/history/i10.jpg" target="_blank" rel="noopener"><img src="img/history/i10.jpg" alt="Texas map: precinct-level 2024 results" width="1100" height="1221" loading="lazy"></a>
+      <div class="stack"><h3>Precinct-level 2024 results</h3><p class="ask">“Search the web for better resolution results, like at the precinct level… you can probably find it for the 2024 presidential results.”</p><p>2026 precinct data is not yet published statewide, so this uses the NYT’s 9,718 Texas precincts for 2024 (totals within 0.1% of certified). Cities split into blue cores and red suburbs; the Rio Grande Valley shows the 2024 shift.</p></div></article>
+    <article class="step"><a class="plate" href="img/history/i11.jpg" target="_blank" rel="noopener"><img src="img/history/i11.jpg" alt="Texas map: sun at 15°, centred labels" width="1100" height="1221" loading="lazy"></a>
+      <div class="stack"><h3>Sun at 15°, centred labels</h3><p class="ask">“Your city labels aren&#x27;t correctly centered in their white background pill shapes… bring [the light] up higher above the horizon, try 15º.”</p><p>Names are centred on cap height. Shadows are half as long. The grade now measures the bare ground in each render, so the background stays the same cream at any sun angle.</p></div></article>
+
+  </div>
+</section>
+
+<section class="stack" style="gap:28px">
+  <div class="stack col">
+    <span class="eyebrow">Pick up where we left off</span>
+    <h2>Make your own map</h2>
+    <p>Clone the repo and either hand it to your own coding agent, or run the commands yourself. <code>AGENTS.md</code> tells any LLM (Claude, Codex, Gemini, Cursor and others) how the pipeline works, what not to break, and how to check its work.</p>
+  </div>
+  <div class="prompt">
+    <span class="eyebrow">A prompt for your agent</span>
+    <button class="copy" type="button" style="top:12px;right:12px">Copy</button>
+    <pre>Clone https://github.com/stamen/prompted-population-maps and read AGENTS.md.
+Set up the environment, then make a population density map of Japan in the same style:
+add a region entry, render a preview, show it to me, and check the population total
+against the official figure before rendering the final.</pre>
+  </div>
+  <div class="grid2">
+    <div class="cmd">
+      <h3>Set up once</h3>
+      <pre>git clone https://github.com/stamen/prompted-population-maps
+cd prompted-population-maps
+uv venv -p 3.13 renv
+uv pip install -p renv/bin/python -r requirements.txt
+export PYTHON=renv/bin/python
+pipeline/fetch_data.sh US DE        # ISO-2 codes you need</pre>
+      <p class="muted small">Blender installs from PyPI as <code>bpy</code>; no Blender app needed. Kontur files come from Kontur's public S3 bucket; boundaries from Natural Earth and the US Census.</p>
+    </div>
+    <div class="cmd">
+      <h3>Make a map</h3>
+      <pre>pipeline/make_map.sh germany preview   # ~30 s
+pipeline/make_map.sh germany final     # 6–15 min
+python docs/build_site.py              # refresh this site</pre>
+      <p class="muted small">Previews are 800 px at 16 samples; finals are 3600 px at 64 samples on 4 CPU cores. Iterate on previews, render the final once.</p>
+    </div>
+  </div>
+  <div class="stack">
+    <h3>Where each style setting lives</h3>
+    <div class="tbl"><table>
+      <tr><th>To change</th><th>File</th><th>Look for</th></tr>
+      <tr><td>A region, its cities, its data</td><td>pipeline/regions.py</td><td>one entry in <code>R</code></td></tr>
+      <tr><td>Sun height and direction</td><td>pipeline/regions.py</td><td><code>SUN_EL</code>, <code>SUN_AZ</code>. Lower elevation means longer shadows</td></tr>
+      <tr><td>Density colour ramp</td><td>pipeline/render.py, pipeline/legend_render.py</td><td><code>stops</code>, <code>cols</code>. Change both, then re-run legend_render.py</td></tr>
+      <tr><td>Election colour ramp</td><td>pipeline/regions.py</td><td><code>EL_STOPS</code>, <code>EL_COLS</code></td></tr>
+      <tr><td>Height exaggeration</td><td>pipeline/render.py</td><td><code>HMAX=0.224*S</code> (S = region extent in km)</td></tr>
+      <tr><td>View tilt</td><td>pipeline/render.py, pipeline/legend_render.py</td><td><code>tilt</code>; <code>pixel_aspect_x = 1/cos(tilt)</code> gives the plan-oblique view</td></tr>
+      <tr><td>Ground and uninhabited land colour</td><td>pipeline/render.py</td><td><code>mat('ground', …)</code>, <code>slabm</code></td></tr>
+      <tr><td>Brightness, contrast, saturation</td><td>pipeline/annotate.py</td><td><code>grade()</code>; the white point is measured from the bare ground</td></tr>
+      <tr><td>Title, legend, callouts, labels</td><td>pipeline/annotate.py</td><td>text blocks; label pills and collision list <code>taken</code></td></tr>
+      <tr><td>Margins and framing</td><td>pipeline/render.py</td><td><code>fx0, fx1, fy0, fy1</code>. Extra room on the east is for shadows</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<section class="stack" style="gap:28px">
+  <div class="stack col">
+    <span class="eyebrow">Lessons</span>
+    <h2>Things that will bite you</h2>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>The densest cell is a needle</h3><p>A city's densest hexagon is one pixel wide and towers over the visible skyline. Labels anchor on the 25th-tallest cell nearby instead, which is where the eye sees the city.</p></div>
+    <div class="card b"><h3>H3 cells are not always hexagons</h3><p>Resolution-7 cells that straddle an icosahedron face edge carry up to 10 boundary vertices. <code>prep.py</code> keeps the six sharpest corners; pentagons are padded to six.</p></div>
+    <div class="card"><h3>Lakes need two polygons</h3><p>Clip the population with the full provincial boundary and build the land from the lake-cut shape. Clipping data with 1:10m lake shorelines dropped 780,000 Ontario lakeshore residents.</p></div>
+    <div class="card b"><h3>Legend colours must be rendered</h3><p>Lighting and tone mapping change how each colour looks. The swatches are flat tiles rendered under the identical sun and sky, then put through the same grade as the map.</p></div>
+    <div class="card"><h3>Dense countries look different</h3><p>Germany, the UK and India are blue almost everywhere because rural density is in the hundreds per km². England's 99th-percentile cell is a quarter of its maximum, so its field is uniformly tall. That is the data.</p></div>
+    <div class="card b"><h3>Check totals, and check sources</h3><p><code>prep.py</code> prints the population it kept: Texas 29.95M, Germany 83.5M, India 1.43B, China 1.43B all match official figures. Election totals were checked against certified or independently reported numbers.</p></div>
+  </div>
+</section>
+
+<section class="stack" style="gap:28px">
+  <div class="stack col">
+    <span class="eyebrow">Cost</span>
+    <h2>What it took</h2>
+    <p class="muted">Everything here was made in one long session with an AI coding agent. The measured totals come from the session's usage record; the per-phase split is an estimate made during the work.</p>
+  </div>
+  <div class="grid2">
+    <div class="stack" style="gap:10px">
+      <h3>Measured, whole session</h3>
+      <div class="tbl"><table><tr><th>Metric</th><th class="r">Value</th></tr><tr><td>Output tokens (written by the model, including reasoning)</td><td class="r">218,110</td></tr><tr><td>Input tokens, not cached</td><td class="r">46,944</td></tr><tr><td>Cache writes</td><td class="r">541,526</td></tr><tr><td>Cache reads (the conversation re-read on every step)</td><td class="r">49,045,711</td></tr><tr><td>API cost at list price</td><td class="r">$18.51</td></tr></table></div>
+      <p class="muted small">As of 2026-11-10 17:52 UTC (repo setup included). Cache reads dominate: every tool call re-reads the conversation so far.</p>
+    </div>
+    <div class="stack" style="gap:10px">
+      <h3>Estimated by phase</h3>
+      <div class="tbl"><table><tr><th>Phase</th><th class="r">New tokens</th></tr><tr><td>Texas: first request, setup, first render</td><td class="r">~22.5k</td></tr><tr><td>Texas: brighter colours, taller, warm ground, labels</td><td class="r">~19k</td></tr><tr><td>Texas: uninhabited land red</td><td class="r">~2.5k</td></tr><tr><td>Texas: names only, taller, five swatches</td><td class="r">~8k</td></tr><tr><td>Texas: plan oblique, title, grade, rendered legend</td><td class="r">~20k</td></tr><tr class=sum><td>Texas subtotal</td><td class="r">~72k</td></tr><tr><td>Generalise the pipeline to any region</td><td class="r">~13k</td></tr><tr><td>Seven regions: config, previews, fixes</td><td class="r">~11.5k</td></tr><tr><td>Ontario lakes</td><td class="r">~4.5k</td></tr><tr><td>Portable scripts and first shared page</td><td class="r">~19k</td></tr><tr><td>Readable labels and stepped legend</td><td class="r">~5k</td></tr><tr><td>2026 Senate results by county</td><td class="r">~22k</td></tr><tr><td>County-coloured land</td><td class="r">~6k</td></tr><tr><td>Precinct search and 2024 precinct map</td><td class="r">~18k</td></tr><tr><td>Sun at 15°, centred labels</td><td class="r">~9k</td></tr><tr><td>Repo, agent guide and Pages site</td><td class="r">~30k</td></tr><tr class=sum><td>Each additional region, once generalised</td><td class="r">~2k</td></tr></table></div>
+    </div>
+  </div>
+  <p class="col muted small">The first map took about a third of the session. Once the pipeline was general, a new region cost about 2k new tokens (one config entry plus reviewing one preview) and 6–15 minutes of rendering.</p>
+</section>
+
+<section class="stack" style="gap:20px">
+  <div class="stack col">
+    <span class="eyebrow">Source</span>
+    <h2>The code</h2>
+    <p class="muted">The same files as in the repository, shown here for reading.</p>
+  </div>
+  <details><summary>AGENTS.md<span>instructions for coding agents · <a href="https://github.com/stamen/prompted-population-maps/blob/main/AGENTS.md" target="_blank" rel="noopener">on GitHub</a></span></summary><div class="codebox"><button class="copy" type="button">Copy</button><pre># AGENTS.md: working on prompted-population-maps
+
+Instructions for any coding agent (Claude, Codex, Gemini, Cursor, aider, …) or person continuing this project.
+Read this file, then `README.md`. Everything you need to reproduce or extend the maps is in this repo.
+
+## What this repo makes
+
+3D population maps: every inhabited H3 hexagon from Kontur Population is extruded to a height that is
+**linear in people per km²**, then path-traced in Blender Cycles (via the `bpy` Python module) under a low sun,
+so shadows are real ray-traced shadows. Colour is either population density (log scale) or an election
+result (two-party margin, county or precinct), draped over the same population geometry.
+
+## Setup
+
+```bash
+uv venv -p 3.13 renv            # or: python3.13 -m venv renv
+uv pip install -p renv/bin/python -r requirements.txt
+export PYTHON=renv/bin/python
+pipeline/fetch_data.sh US IN FR GB CN HK MO DE CA   # Kontur files by ISO-2 code + boundaries (~2.5 GB)
+pipeline/fetch_data.sh --elections                  # optional: Texas election data
+```
+
+No Blender app is needed; `bpy` is Blender as a Python module. Rendering is CPU-only by default.
+
+## Commands
+
+```bash
+pipeline/make_map.sh germany preview   # 800 px, 16 samples, ~20-45 s  -&gt; out/germany_preview.png
+pipeline/make_map.sh germany final     # 3600 px, 64 samples, 6-15 min on 4 cores -&gt; out/germany.png
+python docs/build_site.py              # rebuild the GitHub Pages site from out/*.png and pipeline/*
+```
+
+`make_map.sh` runs, in order: `legend_render.py` (swatch colours under the current sun), `prep.py` (only if
+`work/&lt;region&gt;.npz` is missing), `render.py`, `annotate.py`. Delete `work/&lt;region&gt;.npz` after changing anything
+that `prep.py` reads (boundaries, clipping, resolution, election data).
+
+## Repo map
+
+| Path | Role |
+|---|---|
+| `pipeline/regions.py` | **All per-map configuration**, paths, sun angle (`SUN_EL`, `SUN_AZ`), election colour ramp |
+| `pipeline/prep.py` | Clip Kontur cells to the boundary, aggregate to H3 res 7 for regions wider than 2,000 km, project (Lambert azimuthal equal-area), join election results, write `work/&lt;region&gt;.npz` |
+| `pipeline/render.py` | Build the Blender scene (hex prisms, land slab, ground, sun, sky, plan-oblique camera), export label anchors, path-trace |
+| `pipeline/annotate.py` | Colour grade, title, legend, callouts, credits, city labels with collision avoidance |
+| `pipeline/legend_render.py` | Render flat swatch tiles under the map&#x27;s exact lighting so legend colours match the map |
+| `pipeline/fetch_data.sh`, `fetch_tx_senate_2026.py` | Data downloads |
+| `docs/` | GitHub Pages site (`index.html` is generated by `docs/build_site.py` from `docs/template.html`) |
+| `fonts/` | Inter (SIL OFL 1.1), used by `annotate.py` |
+
+## Adding a region
+
+1. Add an entry to `R` in `pipeline/regions.py`. Copy a similar one:
+   - `kontur`: ISO-2 codes of the Kontur files (fetch them with `fetch_data.sh`).
+   - `bnd`: `(&#x27;ne0&#x27;, [Natural Earth ADMIN names])` for countries, `(&#x27;ne1&#x27;, &#x27;Province&#x27;)` for provinces
+     (prep.py filters `admin==&#x27;Canada&#x27;`; generalise that filter for other countries), `(&#x27;census&#x27;, &#x27;ST&#x27;)` for US states.
+   - `national=True` only when the Kontur file covers exactly that territory (keeps coastal cells with a 3 km buffer).
+   - optional `bbox` (drop overseas territories), `lakes=True` (cut Natural Earth lakes from the land slab).
+   - `cities`: `(name, lon, lat)` in label priority order; colliding labels are nudged, then dropped.
+2. `pipeline/make_map.sh &lt;region&gt; preview` and **look at the image**.
+3. Check the population total `prep.py` prints against an official figure. Within ~2% is normal.
+4. Render `final`, then `python docs/build_site.py` if it should appear on the site.
+
+## Election maps
+
+Add `election=dict(...)` to a region (see `texas_senate` and `texas_pres2024`):
+- `level=&#x27;county&#x27;`: a CSV with columns `county,d,r,l,o,tot` plus Census county polygons (`counties`, `statefp`).
+- `level=&#x27;precinct&#x27;`: a GeoJSON of precinct polygons with vote columns (`dcol`, `rcol`, `totcol`) and a sibling CSV.
+Each hexagon takes the result of the unit containing its centre; the land slab is built from the unit polygons,
+each in its own result colour. Colour = (D−R)/(D+R) on `EL_STOPS`/`EL_COLS` in `regions.py`.
+
+## Invariants: do not break these
+
+- **Use real data only.** Never invent, interpolate or &quot;fill in&quot; populations or votes. If a source is unreachable, stop and say so.
+- **Heights stay linear** in people per km² (normalised to each map&#x27;s densest cell). Colour carries the log scale.
+- **Keep the density ramp in sync.** `stops`/`cols` appear in `render.py` and `legend_render.py`; change both,
+  then re-run `legend_render.py` (make_map.sh does this). The election ramp lives once, in `regions.py`.
+- **Legend swatches must be rendered**, not picked: lighting and AgX tone mapping change how albedo looks.
+- **Shadows are ray-traced.** Do not add 2D drop shadows or painted shading to the map.
+- **Credit sources** on the image (Kontur CC BY 4.0; Natural Earth; US Census; NYT for precinct data, which is
+  licensed for non-commercial use only and must credit The New York Times).
+
+## Pitfalls already solved (read before &quot;fixing&quot; them)
+
+- A city&#x27;s densest cell is a one-pixel needle; labels anchor on the 25th-tallest cell within ~1.6% of the extent.
+- H3 res-7 cells on icosahedron edges have up to 10 vertices; `prep.py` keeps the 6 sharpest corners.
+- Clip population with the full boundary, but build the land slab from the lake-cut shape (Ontario lost 780k people otherwise).
+- Germany, the UK, India and eastern China are blue nearly everywhere because rural density is in the hundreds per km². That is data.
+- `annotate.py` sets the white point from the bare ground in each render, so any sun angle grades the same.
+- Plan oblique = render the 50° oblique view with `pixel_aspect_x = 1/cos(50°)`; do not stretch images afterwards.
+
+## Verifying a change
+
+Render a preview of `texas` and one other region, open both images, and compare against `docs/img/`.
+For data changes, compare printed totals with official sources. There is no unit-test suite; images are the test.
+</pre></div></details>
+  <details><summary>pipeline/regions.py<span>one entry per map · <a href="https://github.com/stamen/prompted-population-maps/blob/main/pipeline/regions.py" target="_blank" rel="noopener">on GitHub</a></span></summary><div class="codebox"><button class="copy" type="button">Copy</button><pre># One entry per map. cities: (name, lon, lat) in label-priority order.
+import os
+ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA=os.environ.get(&#x27;POPMAPS_DATA&#x27;,os.path.join(ROOT,&#x27;data&#x27;))    # downloads (fetch_data.sh)
+WORK=os.environ.get(&#x27;POPMAPS_WORK&#x27;,os.path.join(ROOT,&#x27;work&#x27;))    # intermediates + raw renders
+OUT=os.environ.get(&#x27;POPMAPS_OUT&#x27;,os.path.join(ROOT,&#x27;out&#x27;))       # finished maps
+FONTS=os.path.join(ROOT,&#x27;fonts&#x27;)
+os.makedirs(WORK,exist_ok=True); os.makedirs(OUT,exist_ok=True)
+NE0=f&#x27;{DATA}/bnd/ne_10m_admin_0_countries.geojson&#x27;; NE1=f&#x27;{DATA}/bnd/ne_10m_admin_1_states_provinces.geojson&#x27;
+LAKES=f&#x27;{DATA}/bnd/ne_10m_lakes.geojson&#x27;
+CENSUS=f&#x27;zip://{DATA}/bnd/cb_2023_us_state_5m.zip&#x27;
+K=f&#x27;{DATA}/kontur/&#x27;
+SUN_EL=15.0; SUN_AZ=282.0     # sun elevation above the horizon and azimuth (degrees); lower = longer shadows
+# election ramp on two-party margin (D-R)/(D+R): -0.6 = R+60 ... +0.6 = D+60
+EL_STOPS=[-0.6,-0.3,-0.1,0.0,0.1,0.3,0.6]
+EL_COLS=[[165,15,30],[214,48,44],[240,160,145],[246,240,232],[150,185,235],[45,110,210],[15,50,160]]
+R={
+ &#x27;texas&#x27;:dict(title=&#x27;Texas&#x27;,kontur=[&#x27;US&#x27;],bnd=(&#x27;census&#x27;,&#x27;TX&#x27;),national=False,credit=&#x27;US Census Bureau cartographic boundary 2023&#x27;,
+   cities=[(&#x27;Houston&#x27;,-95.37,29.76),(&#x27;Dallas&#x27;,-96.80,32.78),(&#x27;Fort Worth&#x27;,-97.33,32.75),(&#x27;San Antonio&#x27;,-98.49,29.42),(&#x27;Austin&#x27;,-97.74,30.27),(&#x27;El Paso&#x27;,-106.44,31.76),(&#x27;McAllen&#x27;,-98.23,26.20),(&#x27;Laredo&#x27;,-99.51,27.51),(&#x27;Corpus Christi&#x27;,-97.40,27.80),(&#x27;Lubbock&#x27;,-101.86,33.58),(&#x27;Amarillo&#x27;,-101.83,35.22),(&#x27;Midland&#x27;,-102.08,32.00)]),
+ &#x27;texas_senate&#x27;:dict(title=&#x27;Texas 2026 U.S. Senate&#x27;,election=dict(level=&#x27;county&#x27;,dem=&#x27;Talarico (D)&#x27;,rep=&#x27;Paxton (R)&#x27;,third=&#x27;Brown (L)&#x27;,csv=f&#x27;{DATA}/election/tx_senate_2026_county.csv&#x27;,counties=f&#x27;zip://{DATA}/bnd/cb_2023_us_county_5m.zip&#x27;,statefp=&#x27;48&#x27;,
+     source=&#x27;Unofficial county returns compiled on Wikipedia (retrieved 10 Nov 2026), spot-checked against Decision Desk HQ and Dallas Morning News reporting&#x27;),kontur=[&#x27;US&#x27;],bnd=(&#x27;census&#x27;,&#x27;TX&#x27;),national=False,credit=&#x27;US Census Bureau cartographic boundary 2023&#x27;,
+   cities=[(&#x27;Houston&#x27;,-95.37,29.76),(&#x27;Dallas&#x27;,-96.80,32.78),(&#x27;Fort Worth&#x27;,-97.33,32.75),(&#x27;San Antonio&#x27;,-98.49,29.42),(&#x27;Austin&#x27;,-97.74,30.27),(&#x27;El Paso&#x27;,-106.44,31.76),(&#x27;McAllen&#x27;,-98.23,26.20),(&#x27;Laredo&#x27;,-99.51,27.51),(&#x27;Corpus Christi&#x27;,-97.40,27.80),(&#x27;Lubbock&#x27;,-101.86,33.58),(&#x27;Amarillo&#x27;,-101.83,35.22),(&#x27;Midland&#x27;,-102.08,32.00)]),
+ &#x27;texas_pres2024&#x27;:dict(title=&#x27;Texas 2024 Presidential&#x27;,election=dict(level=&#x27;precinct&#x27;,dem=&#x27;Harris (D)&#x27;,rep=&#x27;Trump (R)&#x27;,third=None,
+     geo=f&#x27;{DATA}/election/nyt/TX.geojson&#x27;,dcol=&#x27;votes_dem&#x27;,rcol=&#x27;votes_rep&#x27;,totcol=&#x27;votes_total&#x27;,
+     source=&#x27;The New York Times, 2024 presidential precinct results (official precinct boundaries). Used under the NYT non-commercial data agreement&#x27;),kontur=[&#x27;US&#x27;],bnd=(&#x27;census&#x27;,&#x27;TX&#x27;),national=False,credit=&#x27;US Census Bureau cartographic boundary 2023&#x27;,
+   cities=[(&#x27;Houston&#x27;,-95.37,29.76),(&#x27;Dallas&#x27;,-96.80,32.78),(&#x27;Fort Worth&#x27;,-97.33,32.75),(&#x27;San Antonio&#x27;,-98.49,29.42),(&#x27;Austin&#x27;,-97.74,30.27),(&#x27;El Paso&#x27;,-106.44,31.76),(&#x27;McAllen&#x27;,-98.23,26.20),(&#x27;Laredo&#x27;,-99.51,27.51),(&#x27;Corpus Christi&#x27;,-97.40,27.80),(&#x27;Lubbock&#x27;,-101.86,33.58),(&#x27;Amarillo&#x27;,-101.83,35.22),(&#x27;Midland&#x27;,-102.08,32.00)]),
+ &#x27;new_york&#x27;:dict(title=&#x27;New York State&#x27;,kontur=[&#x27;US&#x27;],bnd=(&#x27;census&#x27;,&#x27;NY&#x27;),national=False,
+   credit=&#x27;US Census Bureau cartographic boundary 2023&#x27;,
+   cities=[(&#x27;New York City&#x27;,-74.00,40.71),(&#x27;Buffalo&#x27;,-78.88,42.89),(&#x27;Rochester&#x27;,-77.61,43.16),(&#x27;Syracuse&#x27;,-76.15,43.05),(&#x27;Albany&#x27;,-73.76,42.65),(&#x27;Binghamton&#x27;,-75.91,42.10),(&#x27;Utica&#x27;,-75.23,43.10),(&#x27;Ithaca&#x27;,-76.50,42.44),(&#x27;Plattsburgh&#x27;,-73.45,44.70)]),
+ &#x27;india&#x27;:dict(title=&#x27;India&#x27;,kontur=[&#x27;IN&#x27;],bnd=(&#x27;ne0&#x27;,[&#x27;India&#x27;]),national=True,credit=&#x27;Natural Earth 1:10m (de facto boundaries)&#x27;,
+   cities=[(&#x27;Mumbai&#x27;,72.88,19.08),(&#x27;Delhi&#x27;,77.21,28.61),(&#x27;Kolkata&#x27;,88.36,22.57),(&#x27;Chennai&#x27;,80.27,13.08),(&#x27;Bengaluru&#x27;,77.59,12.97),(&#x27;Hyderabad&#x27;,78.49,17.39),(&#x27;Ahmedabad&#x27;,72.57,23.02),(&#x27;Pune&#x27;,73.86,18.52),(&#x27;Jaipur&#x27;,75.79,26.91),(&#x27;Lucknow&#x27;,80.95,26.85),(&#x27;Patna&#x27;,85.14,25.59),(&#x27;Guwahati&#x27;,91.74,26.14),(&#x27;Srinagar&#x27;,74.80,34.08),(&#x27;Kochi&#x27;,76.27,9.93)]),
+ &#x27;france&#x27;:dict(title=&#x27;France&#x27;,kontur=[&#x27;FR&#x27;],bnd=(&#x27;ne0&#x27;,[&#x27;France&#x27;]),national=True,bbox=(-6,41,10,52),credit=&#x27;Natural Earth 1:10m (metropolitan France)&#x27;,
+   cities=[(&#x27;Paris&#x27;,2.35,48.86),(&#x27;Lyon&#x27;,4.84,45.76),(&#x27;Marseille&#x27;,5.37,43.30),(&#x27;Toulouse&#x27;,1.44,43.60),(&#x27;Nice&#x27;,7.26,43.70),(&#x27;Lille&#x27;,3.06,50.63),(&#x27;Bordeaux&#x27;,-0.58,44.84),(&#x27;Nantes&#x27;,-1.55,47.22),(&#x27;Strasbourg&#x27;,7.75,48.58),(&#x27;Rennes&#x27;,-1.68,48.11),(&#x27;Montpellier&#x27;,3.88,43.61),(&#x27;Ajaccio&#x27;,8.74,41.93)]),
+ &#x27;uk&#x27;:dict(title=&#x27;United Kingdom&#x27;,kontur=[&#x27;GB&#x27;],bnd=(&#x27;ne0&#x27;,[&#x27;United Kingdom&#x27;]),national=True,credit=&#x27;Natural Earth 1:10m&#x27;,
+   cities=[(&#x27;London&#x27;,-0.13,51.51),(&#x27;Birmingham&#x27;,-1.90,52.49),(&#x27;Manchester&#x27;,-2.24,53.48),(&#x27;Glasgow&#x27;,-4.25,55.86),(&#x27;Edinburgh&#x27;,-3.19,55.95),(&#x27;Liverpool&#x27;,-2.98,53.41),(&#x27;Leeds&#x27;,-1.55,53.80),(&#x27;Newcastle&#x27;,-1.61,54.97),(&#x27;Bristol&#x27;,-2.59,51.45),(&#x27;Belfast&#x27;,-5.93,54.60),(&#x27;Cardiff&#x27;,-3.18,51.48),(&#x27;Sheffield&#x27;,-1.47,53.38),(&#x27;Aberdeen&#x27;,-2.10,57.15),(&#x27;Plymouth&#x27;,-4.14,50.38)]),
+ &#x27;china&#x27;:dict(title=&#x27;China&#x27;,kontur=[&#x27;CN&#x27;,&#x27;HK&#x27;,&#x27;MO&#x27;],bnd=(&#x27;ne0&#x27;,[&#x27;China&#x27;,&#x27;Hong Kong S.A.R.&#x27;,&#x27;Macao S.A.R&#x27;]),national=True,
+   credit=&#x27;Natural Earth 1:10m (de facto boundaries; includes Hong Kong &amp; Macau)&#x27;,
+   cities=[(&#x27;Shanghai&#x27;,121.47,31.23),(&#x27;Beijing&#x27;,116.40,39.90),(&#x27;Guangzhou&#x27;,113.26,23.13),(&#x27;Shenzhen&#x27;,114.06,22.54),(&#x27;Chongqing&#x27;,106.55,29.56),(&#x27;Chengdu&#x27;,104.07,30.57),(&#x27;Wuhan&#x27;,114.31,30.59),(&quot;Xi&#x27;an&quot;,108.94,34.34),(&#x27;Tianjin&#x27;,117.20,39.13),(&#x27;Harbin&#x27;,126.53,45.80),(&#x27;Hong Kong&#x27;,114.17,22.32),(&#x27;Kunming&#x27;,102.83,24.88),(&#x27;Shenyang&#x27;,123.43,41.80),(&#x27;Ürümqi&#x27;,87.62,43.83),(&#x27;Lhasa&#x27;,91.13,29.65),(&#x27;Lanzhou&#x27;,103.83,36.06)]),
+ &#x27;ontario&#x27;:dict(title=&#x27;Ontario&#x27;,kontur=[&#x27;CA&#x27;],bnd=(&#x27;ne1&#x27;,&#x27;Ontario&#x27;),national=False,lakes=True,credit=&#x27;Natural Earth 1:10m (lakes removed)&#x27;,
+   cities=[(&#x27;Toronto&#x27;,-79.38,43.65),(&#x27;Ottawa&#x27;,-75.70,45.42),(&#x27;Hamilton&#x27;,-79.87,43.26),(&#x27;London&#x27;,-81.25,42.98),(&#x27;Windsor&#x27;,-83.03,42.31),(&#x27;Kitchener&#x27;,-80.49,43.45),(&#x27;Sudbury&#x27;,-80.99,46.49),(&#x27;Thunder Bay&#x27;,-89.25,48.38),(&#x27;Kingston&#x27;,-76.48,44.23),(&#x27;Sault Ste. Marie&#x27;,-84.33,46.52),(&#x27;Timmins&#x27;,-81.33,48.48),(&#x27;Moosonee&#x27;,-80.65,51.27)]),
+ &#x27;germany&#x27;:dict(title=&#x27;Germany&#x27;,kontur=[&#x27;DE&#x27;],bnd=(&#x27;ne0&#x27;,[&#x27;Germany&#x27;]),national=True,credit=&#x27;Natural Earth 1:10m&#x27;,
+   cities=[(&#x27;Berlin&#x27;,13.40,52.52),(&#x27;Hamburg&#x27;,9.99,53.55),(&#x27;Munich&#x27;,11.58,48.14),(&#x27;Cologne&#x27;,6.96,50.94),(&#x27;Frankfurt&#x27;,8.68,50.11),(&#x27;Stuttgart&#x27;,9.18,48.78),(&#x27;Düsseldorf&#x27;,6.77,51.23),(&#x27;Leipzig&#x27;,12.37,51.34),(&#x27;Dresden&#x27;,13.74,51.05),(&#x27;Hanover&#x27;,9.73,52.37),(&#x27;Nuremberg&#x27;,11.08,49.45),(&#x27;Bremen&#x27;,8.80,53.08),(&#x27;Dortmund&#x27;,7.47,51.51)]),
+}
+</pre></div></details>
+  <details><summary>pipeline/prep.py<span>clip, aggregate, project, join elections · <a href="https://github.com/stamen/prompted-population-maps/blob/main/pipeline/prep.py" target="_blank" rel="noopener">on GitHub</a></span></summary><div class="codebox"><button class="copy" type="button">Copy</button><pre>import sys, numpy as np, pandas as pd, pyogrio, h3, geopandas as gpd, shapely, time
+from shapely.ops import unary_union
+from pyproj import Transformer
+import os; sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); from regions import *
+key=sys.argv[1]; c=R[key]; t=time.time()
+b=c[&#x27;bnd&#x27;]
+if b[0]==&#x27;census&#x27;: g=gpd.read_file(CENSUS); g=g[g.STUSPS==b[1]].to_crs(4326).geometry
+elif b[0]==&#x27;ne0&#x27;: g=gpd.read_file(NE0); g=g[g.ADMIN.isin(b[1])].geometry
+else: g=gpd.read_file(NE1); g=g[(g[&#x27;name&#x27;]==b[1])&amp;(g.admin==&#x27;Canada&#x27;)].geometry
+geom=unary_union(list(g))
+if &#x27;bbox&#x27; in c: geom=geom.intersection(shapely.box(*c[&#x27;bbox&#x27;]))
+if c.get(&#x27;lakes&#x27;):   # cut out the Great Lakes and inland lakes so the land mass follows the real shoreline
+    lk=gpd.read_file(LAKES); lk=lk[lk.intersects(geom)].geometry; land=geom.difference(unary_union(list(lk))).buffer(0)
+else: land=geom
+df=pd.concat([pyogrio.read_dataframe(K+f+&#x27;.gpkg&#x27;,read_geometry=False,columns=[&#x27;h3&#x27;,&#x27;population&#x27;]) for f in c[&#x27;kontur&#x27;]])
+lon0,lat0=(geom.bounds[0]+geom.bounds[2])/2,(geom.bounds[1]+geom.bounds[3])/2
+tr=Transformer.from_crs(4326,f&#x27;+proj=laea +lat_0={lat0} +lon_0={lon0} +units=km&#x27;,always_xy=True)
+gp=shapely.ops.transform(lambda x,y:tr.transform(x,y),geom)
+gl=shapely.ops.transform(lambda x,y:tr.transform(x,y),land)
+S=max(gp.bounds[2]-gp.bounds[0],gp.bounds[3]-gp.bounds[1])
+res=8 if S&lt;=2000 else 7
+cells=df.h3.values; pop=df.population.values.astype(float)
+if res&lt;8:   # sum Kontur res-8 populations into their res-7 parents (real totals, coarser cells)
+    par=np.array([h3.cell_to_parent(x,res) for x in cells]); s=pd.Series(pop).groupby(par).sum(); cells=s.index.values; pop=s.values
+ll=np.array([h3.cell_to_latlng(x) for x in cells])
+clip=gp.buffer(3.0) if c[&#x27;national&#x27;] else gp    # national files contain only that country: small buffer keeps coastal cells
+X,Y=tr.transform(ll[:,1],ll[:,0]); keep=shapely.contains_xy(clip,X,Y)
+cells,pop=cells[keep],pop[keep]
+def bnd6(x):
+    v=h3.cell_to_boundary(x)
+    if len(v)&gt;6:   # icosahedron-edge cells carry extra near-collinear &#x27;distortion&#x27; vertices: keep the 6 sharpest corners
+        a=np.array(v); d1=a-np.roll(a,1,0); d2=np.roll(a,-1,0)-a
+        ang=np.abs(np.arctan2(d1[:,0]*d2[:,1]-d1[:,1]*d2[:,0],(d1*d2).sum(1)))
+        v=tuple(map(tuple,a[np.sort(np.argsort(-ang)[:6])]))
+    return v if len(v)==6 else v+(v[-1],)*(6-len(v))
+verts=np.array([bnd6(x) for x in cells]); vx,vy=tr.transform(verts[...,1],verts[...,0])
+area=np.array([h3.cell_area(x,&#x27;km^2&#x27;) for x in cells])
+cx,cy=(gp.bounds[0]+gp.bounds[2])/2,(gp.bounds[1]+gp.bounds[3])/2
+parts=[p for p in (gl.geoms if gl.geom_type==&#x27;MultiPolygon&#x27; else [gl]) if p.area&gt;max(20,S*S*2e-5)]
+polys=np.empty(len(parts),object); polys[:]=[np.array(p.simplify(S/4000).exterior.coords)-[cx,cy] for p in parts]
+extra={}
+if &#x27;election&#x27; in c:
+    E=c[&#x27;election&#x27;]
+    if E[&#x27;level&#x27;]==&#x27;county&#x27;:   # county table joined to Census county polygons by name
+        er=pd.read_csv(E[&#x27;csv&#x27;]); er[&#x27;m&#x27;]=(er.d-er.r)/(er.d+er.r)
+        co=gpd.read_file(E[&#x27;counties&#x27;]); co=co[co.STATEFP==E[&#x27;statefp&#x27;]].merge(er,left_on=&#x27;NAME&#x27;,right_on=&#x27;county&#x27;).to_crs(4326)
+    else:                      # precinct polygons that already carry vote counts
+        co=gpd.read_file(E[&#x27;geo&#x27;]).to_crs(4326); co[&#x27;m&#x27;]=(co[E[&#x27;dcol&#x27;]]-co[E[&#x27;rcol&#x27;]])/(co[E[&#x27;dcol&#x27;]]+co[E[&#x27;rcol&#x27;]]).clip(lower=1)
+        co[&#x27;geometry&#x27;]=co.geometry.buffer(0)
+    lat_,lon_=np.array([h3.cell_to_latlng(x) for x in cells]).T
+    pts=gpd.GeoDataFrame(geometry=gpd.points_from_xy(lon_,lat_),crs=4326)
+    j=gpd.sjoin_nearest(pts.to_crs(3083),co[[&#x27;m&#x27;,&#x27;geometry&#x27;]].to_crs(3083),how=&#x27;left&#x27;).groupby(level=0).first()   # nearest handles edge cells
+    # county-coloured slab: triangulate each county (holes/islands kept) and keep its outline rings for walls
+    ct,ctm,cr,crm=[],[],[],[]
+    for g_,m_ in zip(co.geometry,co.m):
+        gq=shapely.ops.transform(lambda x,y:tr.transform(x,y),g_)
+        for p_ in (gq.geoms if gq.geom_type==&#x27;MultiPolygon&#x27; else [gq]):
+            q=p_.simplify(S/4000 if E[&#x27;level&#x27;]==&#x27;county&#x27; else S/25000)   # precincts are tiny in cities: simplify gently
+            if q.is_empty or q.area&lt;0.0005: continue
+            if not q.is_valid: q=q.buffer(0)
+            if q.geom_type!=&#x27;Polygon&#x27;: continue
+            for t_ in shapely.constrained_delaunay_triangles(q).geoms: ct.append(np.array(t_.exterior.coords)[:3]-[cx,cy]); ctm.append(m_)
+            for r_ in [q.exterior,*q.interiors]: cr.append(np.array(r_.coords)-[cx,cy]); crm.append(m_)
+    extra[&#x27;ctris&#x27;]=np.array(ct); extra[&#x27;ctm&#x27;]=np.array(ctm); rr=np.empty(len(cr),object); rr[:]=cr; extra[&#x27;crings&#x27;]=rr; extra[&#x27;crm&#x27;]=np.array(crm)
+    print(&#x27;county slab triangles&#x27;,len(ct))
+    extra[&#x27;margin&#x27;]=j[&#x27;m&#x27;].values; print(&#x27;cells per county ok; margin range&#x27;,np.nanmin(extra[&#x27;margin&#x27;]).round(3),np.nanmax(extra[&#x27;margin&#x27;]).round(3))
+if c.get(&#x27;lakes&#x27;):   # triangulate the slab with holes (inland lakes), plus every ring for the side walls
+    tris=[];rings=[]
+    for p in parts:
+        q=p.simplify(S/4000)
+        for t_ in shapely.constrained_delaunay_triangles(q).geoms: tris.append(np.array(t_.exterior.coords)[:3]-[cx,cy])
+        rings+= [np.array(q.exterior.coords)-[cx,cy]]+[np.array(r.coords)-[cx,cy] for r in q.interiors]
+    rr=np.empty(len(rings),object); rr[:]=rings; extra=dict(tris=np.array(tris),rings=rr)
+    print(&#x27;slab triangles&#x27;,len(tris),&#x27;rings&#x27;,len(rings))
+np.savez(f&#x27;{WORK}/{key}.npz&#x27;,**extra,x=vx-cx,y=vy-cy,pop=pop,area=area,polys=polys,proj=np.array([lon0,lat0,cx,cy]),
+         bounds=np.array(gp.bounds)-[cx,cy,cx,cy],res=res)
+print(f&#x27;{key}: res{res} cells={len(cells)} pop={pop.sum():,.0f} extent={S:.0f}km polys={len(parts)} maxdens={np.max(pop/area):,.0f} {time.time()-t:.0f}s&#x27;)
+</pre></div></details>
+  <details><summary>pipeline/render.py<span>build scene and path-trace · <a href="https://github.com/stamen/prompted-population-maps/blob/main/pipeline/render.py" target="_blank" rel="noopener">on GitHub</a></span></summary><div class="codebox"><button class="copy" type="button">Copy</button><pre># usage: render.py &lt;region&gt; &lt;width_px&gt; &lt;spp&gt; &lt;out.png&gt;   (height is derived from the region&#x27;s plan-oblique frame)
+import bpy, bmesh, numpy as np, math, sys, time, json
+from mathutils import Vector
+from bpy_extras.object_utils import world_to_camera_view
+import os; sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); from regions import R, WORK
+key,WPX,SPP,OUT=sys.argv[1],int(sys.argv[2]),int(sys.argv[3]),sys.argv[4]
+d=np.load(f&#x27;{WORK}/{key}.npz&#x27;,allow_pickle=True); c=R[key]
+X,Y=d[&#x27;x&#x27;],d[&#x27;y&#x27;]; dens=d[&#x27;pop&#x27;]/d[&#x27;area&#x27;]; n=len(dens)
+x0,y0,x1,y1=d[&#x27;bounds&#x27;]; S=max(x1-x0,y1-y0)          # all dimensions scale from the Texas design (S=1250 km)
+HMAX=0.224*S; h=0.0002*S+dens/dens.max()*HMAX; SLAB=0.0024*S
+# colour: same absolute log-density ramp as Texas, so maps are comparable
+ld=np.log10(np.clip(dens,1,None)); stops=np.array([0.0,1.0,1.8,2.6,3.4,4.15])
+cols=np.array([[215,38,40],[232,84,66],[250,246,240],[244,246,250],[70,135,225],[25,90,215]])/255.
+rgb=np.stack([np.interp(ld,stops,cols[:,k]) for k in range(3)],1)
+if &#x27;margin&#x27; in d.files:   # colour = county two-party margin (D-R)/(D+R): red Republican, blue Democratic
+    from regions import EL_STOPS, EL_COLS
+    ec=np.array(EL_COLS)/255.; rgb=np.stack([np.interp(d[&#x27;margin&#x27;],EL_STOPS,ec[:,k]) for k in range(3)],1)
+lin=np.where(rgb&lt;=0.04045,rgb/12.92,((rgb+0.055)/1.055)**2.4)
+V=np.stack([np.concatenate([X,X],1),np.concatenate([Y,Y],1),np.concatenate([np.repeat(h[:,None],6,1),np.zeros((n,6))],1)],-1).reshape(-1,3)
+base=(np.arange(n)*12)[:,None]; top=base+np.arange(6)[None,:]
+sides=np.stack([np.stack([base[:,0]+a,base[:,0]+6+a,base[:,0]+6+(a+1)%6,base[:,0]+(a+1)%6],1) for a in range(6)],1)
+loops=np.concatenate([top,sides.reshape(n,24)],1).reshape(-1); sizes=np.tile([6,4,4,4,4,4,4],n); starts=np.concatenate([[0],np.cumsum(sizes)[:-1]])
+bpy.ops.wm.read_factory_settings(use_empty=True); s=bpy.context.scene
+me=bpy.data.meshes.new(&#x27;hex&#x27;); me.vertices.add(len(V)); me.vertices.foreach_set(&#x27;co&#x27;,V.astype(np.float32).ravel())
+me.loops.add(len(loops)); me.loops.foreach_set(&#x27;vertex_index&#x27;,loops.astype(np.int32))
+me.polygons.add(len(sizes)); me.polygons.foreach_set(&#x27;loop_start&#x27;,starts.astype(np.int32)); me.polygons.foreach_set(&#x27;loop_total&#x27;,sizes.astype(np.int32))
+me.update(calc_edges=True); me.validate()
+at=me.attributes.new(&#x27;col&#x27;,&#x27;FLOAT_COLOR&#x27;,&#x27;FACE&#x27;); at.data.foreach_set(&#x27;color&#x27;,np.repeat(np.concatenate([lin,np.ones((n,1))],1),7,0).astype(np.float32).ravel())
+ob=bpy.data.objects.new(&#x27;hex&#x27;,me); s.collection.objects.link(ob); bpy.context.view_layer.objects.active=ob; ob.select_set(True)
+bpy.ops.object.mode_set(mode=&#x27;EDIT&#x27;); bpy.ops.mesh.select_all(action=&#x27;SELECT&#x27;); bpy.ops.mesh.normals_make_consistent(inside=False); bpy.ops.object.mode_set(mode=&#x27;OBJECT&#x27;)
+def mat(name,color=None,attr=None,rough=0.55):
+    m=bpy.data.materials.new(name); m.use_nodes=True; p=m.node_tree.nodes[&#x27;Principled BSDF&#x27;]; p.inputs[&#x27;Roughness&#x27;].default_value=rough
+    if attr: a=m.node_tree.nodes.new(&#x27;ShaderNodeAttribute&#x27;); a.attribute_name=attr; m.node_tree.links.new(a.outputs[&#x27;Color&#x27;],p.inputs[&#x27;Base Color&#x27;])
+    else: p.inputs[&#x27;Base Color&#x27;].default_value=(*color,1)
+    return m
+ob.data.materials.append(mat(&#x27;hexm&#x27;,attr=&#x27;col&#x27;))
+slabm=mat(&#x27;slab&#x27;,(0.30,0.27,0.24) if &#x27;margin&#x27; in d.files else (0.680,0.019,0.021),rough=0.8)      # uninhabited: neutral for election maps, lowest red class for density
+def elcol(m):   # election ramp in linear RGB
+    from regions import EL_STOPS, EL_COLS
+    ec=np.array(EL_COLS)/255.; r=np.stack([np.interp(m,EL_STOPS,ec[:,k]) for k in range(3)],-1)
+    return np.where(r&lt;=0.04045,r/12.92,((r+0.055)/1.055)**2.4)
+if &#x27;ctris&#x27; in d.files:   # election maps: slab built from county polygons, each in its county&#x27;s result colour
+    T=d[&#x27;ctris&#x27;]; nt=len(T); C=elcol(d[&#x27;ctm&#x27;])
+    vt=[np.dstack([T,np.zeros((nt,3,1))]).reshape(-1,3),np.dstack([T,np.full((nt,3,1),-SLAB)]).reshape(-1,3)]
+    ft=[(3*i,3*i+1,3*i+2) for i in range(nt)]+[(3*(nt+i)+2,3*(nt+i)+1,3*(nt+i)) for i in range(nt)]; fc=list(C)+list(C)
+    o_=2*3*nt
+    for Rg,m_ in zip(d[&#x27;crings&#x27;],elcol(d[&#x27;crm&#x27;])):
+        k_=len(Rg)-1; vt.append(np.vstack([np.c_[Rg[:-1],np.zeros(k_)],np.c_[Rg[:-1],np.full(k_,-SLAB)]]))
+        ft+=[(o_+i,o_+(i+1)%k_,o_+k_+(i+1)%k_,o_+k_+i) for i in range(k_)]; fc+=[m_]*k_; o_+=2*k_
+    sm=bpy.data.meshes.new(&#x27;cslab&#x27;); sm.from_pydata(np.vstack(vt).tolist(),[],ft); sm.update()
+    a_=sm.attributes.new(&#x27;col&#x27;,&#x27;FLOAT_COLOR&#x27;,&#x27;FACE&#x27;); a_.data.foreach_set(&#x27;color&#x27;,np.c_[np.array(fc),np.ones(len(fc))].astype(np.float32).ravel())
+    so_=bpy.data.objects.new(&#x27;cslab&#x27;,sm); s.collection.objects.link(so_); sm.materials.append(mat(&#x27;cslabm&#x27;,attr=&#x27;col&#x27;,rough=0.8))
+    bpy.context.view_layer.objects.active=so_; bpy.ops.object.mode_set(mode=&#x27;EDIT&#x27;); bpy.ops.mesh.select_all(action=&#x27;SELECT&#x27;)
+    bpy.ops.mesh.normals_make_consistent(inside=False); bpy.ops.object.mode_set(mode=&#x27;OBJECT&#x27;)
+elif &#x27;tris&#x27; in d.files:   # hole-aware slab (lakes cut out): triangulated top/bottom + walls on every ring
+    T=d[&#x27;tris&#x27;]; nt=len(T); vt=np.concatenate([np.dstack([T,np.zeros((nt,3,1))]),np.dstack([T,np.full((nt,3,1),-SLAB)])]).reshape(-1,3)
+    ft=[(3*i,3*i+1,3*i+2) for i in range(nt)]+[(3*(nt+i)+2,3*(nt+i)+1,3*(nt+i)) for i in range(nt)]
+    for Rg in d[&#x27;rings&#x27;]:
+        o_=len(vt); m_=len(Rg)-1; ring=np.vstack([np.c_[Rg[:-1],np.zeros(m_)],np.c_[Rg[:-1],np.full(m_,-SLAB)]]); vt=np.vstack([vt,ring])
+        ft+=[(o_+i,o_+(i+1)%m_,o_+m_+(i+1)%m_,o_+m_+i) for i in range(m_)]
+    sm=bpy.data.meshes.new(&#x27;slab&#x27;); sm.from_pydata(vt.tolist(),[],ft); sm.update(); sm.validate()
+    so_=bpy.data.objects.new(&#x27;slab&#x27;,sm); s.collection.objects.link(so_); sm.materials.append(slabm)
+    bpy.context.view_layer.objects.active=so_; bpy.ops.object.mode_set(mode=&#x27;EDIT&#x27;); bpy.ops.mesh.select_all(action=&#x27;SELECT&#x27;)
+    bpy.ops.mesh.remove_doubles(threshold=1e-4); bpy.ops.mesh.normals_make_consistent(inside=False); bpy.ops.object.mode_set(mode=&#x27;OBJECT&#x27;)
+for k,P in enumerate([] if (&#x27;tris&#x27; in d.files or &#x27;ctris&#x27; in d.files) else d[&#x27;polys&#x27;]):
+    sm=bpy.data.meshes.new(f&#x27;s{k}&#x27;); bm=bmesh.new(); vs=[bm.verts.new((px,py,0.0)) for px,py in P[:-1]]
+    try: f=bm.faces.new(vs)
+    except Exception: bm.free(); continue
+    r=bmesh.ops.extrude_face_region(bm,geom=[f]); bmesh.ops.translate(bm,verts=[e for e in r[&#x27;geom&#x27;] if isinstance(e,bmesh.types.BMVert)],vec=(0,0,-SLAB))
+    bmesh.ops.recalc_face_normals(bm,faces=bm.faces); bm.to_mesh(sm); bm.free()
+    so_=bpy.data.objects.new(f&#x27;s{k}&#x27;,sm); s.collection.objects.link(so_); sm.materials.append(slabm)
+bpy.ops.mesh.primitive_plane_add(size=6*S,location=(0,0,-SLAB)); bpy.context.object.data.materials.append(mat(&#x27;ground&#x27;,(0.92,0.72,0.50),rough=0.9))
+sun=bpy.data.lights.new(&#x27;sun&#x27;,&#x27;SUN&#x27;); sun.energy=6.0; sun.angle=math.radians(0.6); sun.color=(1.0,0.93,0.84)
+so=bpy.data.objects.new(&#x27;sun&#x27;,sun); s.collection.objects.link(so); from regions import SUN_EL, SUN_AZ; el,az=math.radians(SUN_EL),math.radians(SUN_AZ)
+so.rotation_euler=Vector((math.sin(az)*math.cos(el),math.cos(az)*math.cos(el),math.sin(el))).to_track_quat(&#x27;Z&#x27;,&#x27;Y&#x27;).to_euler()
+w=bpy.data.worlds.new(&#x27;w&#x27;); s.world=w; w.use_nodes=True
+w.node_tree.nodes[&#x27;Background&#x27;].inputs[&#x27;Color&#x27;].default_value=(0.55,0.65,0.85,1); w.node_tree.nodes[&#x27;Background&#x27;].inputs[&#x27;Strength&#x27;].default_value=0.35
+# ---- plan-oblique frame: margins for shadows (east), title (top) and credits (bottom)
+fx0,fx1,fy0,fy1=x0-0.03*S,x1+0.13*S,y0-0.12*S,y1+0.22*S
+FW,FH=fx1-fx0,fy1-fy0; HPX=int(round(WPX*FH/FW))
+if HPX&gt;int(WPX*1.4): WPX=int(round(WPX*1.4*FW/FH)); HPX=int(round(WPX*FH/FW))   # cap very tall frames
+tilt=math.radians(50); D=4*S
+cam=bpy.data.cameras.new(&#x27;cam&#x27;); cam.type=&#x27;ORTHO&#x27;; cam.ortho_scale=FW; cam.sensor_fit=&#x27;HORIZONTAL&#x27;; cam.clip_end=20*S
+co=bpy.data.objects.new(&#x27;cam&#x27;,cam); s.collection.objects.link(co); s.camera=co
+co.location=((fx0+fx1)/2,(fy0+fy1)/2-D*math.sin(tilt),D*math.cos(tilt)); co.rotation_euler=(tilt,0,0)
+s.render.resolution_x=WPX; s.render.resolution_y=HPX; s.render.resolution_percentage=100
+s.render.pixel_aspect_x=1/math.cos(tilt); s.render.pixel_aspect_y=1.0; bpy.context.view_layer.update()
+# ---- label anchors: each city&#x27;s visible skyline (25th-tallest cell within ~1.6% of extent)
+from pyproj import Transformer
+lon0,lat0,pcx,pcy=d[&#x27;proj&#x27;]; tr=Transformer.from_crs(4326,f&#x27;+proj=laea +lat_0={lat0} +lon_0={lon0} +units=km&#x27;,always_xy=True)
+CX,CY=X.mean(1),Y.mean(1); lab=[]; rad=max(12,0.016*S)
+for name,lon,lat in c[&#x27;cities&#x27;]:
+    ex,ey=tr.transform(lon,lat); ex-=pcx; ey-=pcy
+    m=np.where((CX-ex)**2+(CY-ey)**2&lt;rad**2)[0]
+    if len(m)==0: print(&#x27;no cells near&#x27;,name); continue
+    sky=np.sort(h[m])[-min(25,len(m))]; j=m[np.argmin(np.abs(h[m]-sky))]
+    v=world_to_camera_view(s,co,Vector((CX[j],CY[j],h[j]))); lab.append((name,v.x*WPX,(1-v.y)*HPX))
+meta=dict(labels=lab,cells=int(n),res=int(d[&#x27;res&#x27;]),cell_km2=float(np.median(d[&#x27;area&#x27;])),pop=float(d[&#x27;pop&#x27;].sum()))
+json.dump(meta,open(OUT.rsplit(&#x27;.&#x27;,1)[0]+&#x27;_meta.json&#x27;,&#x27;w&#x27;))
+s.render.engine=&#x27;CYCLES&#x27;; s.cycles.device=&#x27;CPU&#x27;; s.cycles.samples=SPP; s.cycles.use_denoising=True; s.cycles.max_bounces=4
+s.view_settings.view_transform=&#x27;AgX&#x27;; s.view_settings.look=&#x27;AgX - Medium High Contrast&#x27;
+s.render.image_settings.file_format=&#x27;PNG&#x27;; s.render.filepath=OUT
+t=time.time(); bpy.ops.render.render(write_still=True); print(f&#x27;{key} {WPX}x{HPX} render {time.time()-t:.0f}s faces {len(me.polygons)}&#x27;)
+</pre></div></details>
+  <details><summary>pipeline/annotate.py<span>grade, title, legend, labels · <a href="https://github.com/stamen/prompted-population-maps/blob/main/pipeline/annotate.py" target="_blank" rel="noopener">on GitHub</a></span></summary><div class="codebox"><button class="copy" type="button">Copy</button><pre># usage: annotate.py &lt;region&gt; &lt;raw.png&gt; &lt;out.png&gt;
+import numpy as np, sys, json, os
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
+sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); from regions import R, WORK, SUN_EL, FONTS
+from pyproj import Transformer
+key,RAW,OUT=sys.argv[1:4]; c=R[key]; meta=json.load(open(RAW.rsplit(&#x27;.&#x27;,1)[0]+&#x27;_meta.json&#x27;))
+def ground_level(im):
+    a=np.asarray(im).astype(np.float32); W_,H_=im.size; g=a[int(H_*0.01):int(H_*0.06),int(W_*0.85):int(W_*0.99)].max(2).ravel()
+    return float(np.median(g[g&gt;=np.median(g)]))
+def grade(im,wp):
+    a=np.asarray(im).astype(np.float32)/255
+    a=np.clip(a/(wp/255),0,1); a=np.clip(a-0.10*np.sin(2*np.pi*a)/np.pi,0,1)**1.03
+    l=a@np.array([0.2126,0.7152,0.0722],np.float32); sat=a.max(2)-a.min(2)
+    f=np.where(sat&lt;0.22,0.55,1.0-0.10*np.clip((sat-0.22)/0.4,0,1))
+    a=np.clip(l[...,None]+(a-l[...,None])*f[...,None],0,1)*np.array([1.0,0.99,0.965],np.float32)
+    im=Image.fromarray((np.clip(a,0,1)*255+0.5).astype(np.uint8))
+    return im.filter(ImageFilter.UnsharpMask(radius=max(1,im.size[0]/1800),percent=55,threshold=2))
+raw=Image.open(RAW).convert(&#x27;RGB&#x27;); WP=ground_level(raw)*1.024; W,H=raw.size; U=0.75*min(W,H*0.857)
+F=FONTS+&#x27;/&#x27;
+fT=ImageFont.truetype(F+&#x27;InterDisplay-Bold.otf&#x27;,int(U*0.040)); fS=ImageFont.truetype(F+&#x27;Inter-Regular.otf&#x27;,int(U*0.0155))
+fL=ImageFont.truetype(F+&#x27;Inter-Medium.otf&#x27;,int(U*0.0135)); fLb=ImageFont.truetype(F+&#x27;Inter-SemiBold.otf&#x27;,int(U*0.0140))
+fC=ImageFont.truetype(F+&#x27;Inter-Regular.otf&#x27;,int(U*0.0115)); fN=ImageFont.truetype(F+&#x27;Inter-Bold.otf&#x27;,int(U*0.0185))
+ink=(48,38,30); sub=(95,82,68); cream=(250,244,234)
+mx,my=int(W*0.045),int(U*0.05)
+if &#x27;election&#x27; in c:
+    # ---- election legend: 5 equal swatches on the two-party margin, plus the statewide result
+    E=c[&#x27;election&#x27;]; import pandas as pd
+    if E[&#x27;level&#x27;]==&#x27;county&#x27;: er=pd.read_csv(E[&#x27;csv&#x27;]); T=dict(d=er.d.sum(),r=er.r.sum(),l=er.l.sum(),tot=er.tot.sum())
+    else: er=pd.read_csv(E[&#x27;geo&#x27;].replace(&#x27;.geojson&#x27;,&#x27;.csv&#x27;)); T=dict(d=er[E[&#x27;dcol&#x27;]].sum(),r=er[E[&#x27;rcol&#x27;]].sum(),l=0,tot=er[E[&#x27;totcol&#x27;]].sum())
+    T=pd.Series(T)
+    sw,gap,sh=int(U*0.05),int(U*0.004),int(U*0.024); yb=my+int(U*0.10)+sh
+    d0=ImageDraw.Draw(raw)
+    for n,col in enumerate(json.load(open(f&#x27;{WORK}/legend_colors_election.json&#x27;))):
+        x=mx+n*(sw+gap); d0.rectangle([x,yb-sh,x+sw,yb],fill=tuple(int(q) for q in col))
+    im=grade(raw,WP); dr=ImageDraw.Draw(im)
+    dr.text((mx,my),f&quot;{c[&#x27;title&#x27;]} Results&quot;,font=fT,fill=ink)
+    dr.text((mx,my+int(U*0.055)),f&quot;Colour: {E[&#x27;level&#x27;]} two-party margin. Height: people per km² (linear), on 317,903 H3 hexagons.&quot;,font=fS,fill=sub)
+    for n,lab in enumerate([&#x27;R+60&#x27;,&#x27;R+30&#x27;,&#x27;Even&#x27;,&#x27;D+30&#x27;,&#x27;D+60&#x27;]):
+        x=mx+n*(sw+gap); dr.rectangle([x,yb-sh,x+sw,yb],outline=(175,160,140),width=1)
+        w=dr.textlength(lab,font=fL); dr.text((x+sw/2-w/2,yb+int(U*0.006)),lab,font=fL,fill=ink)
+    lx2=mx+5*(sw+gap)+int(U*0.014); y=yb-sh-int(U*0.012)
+    pc=lambda v:f&quot;{v/T.tot*100:.1f}%&quot;
+    head=f&quot;{E[&#x27;dem&#x27;]} {pc(T.d)}  ·  {E[&#x27;rep&#x27;]} {pc(T.r)}&quot;+(f&quot;  ·  {E[&#x27;third&#x27;]} {pc(T.l)}&quot; if E.get(&#x27;third&#x27;) else f&quot;  ·  others {pc(T.tot-T.d-T.r)}&quot;)
+    for t,f,col in [(head,fLb,ink),
+                    (f&quot;{T.tot:,.0f} votes. Every hexagon takes its {E[&#x27;level&#x27;]}&#x27;s result,&quot;,fL,sub),
+                    (&quot;so tall spikes show where the votes were cast.&quot;,fL,sub)]:
+        dr.text((lx2,y),t,font=f,fill=col); y+=int(f.size*1.45)
+    legend_bottom=max(y,yb+int(U*0.03))
+else:
+    # ---- legend: a staircase of the 5 classes (one step per 10x), bottom-aligned on a baseline
+    sw,gap=int(U*0.05),int(U*0.004); step=int(U*0.011); base_h=int(U*0.014)
+    yb=my+int(U*0.10)+base_h+4*step                                       # baseline of the stairs
+    d0=ImageDraw.Draw(raw)
+    for n,col in enumerate(json.load(open(f&#x27;{WORK}/legend_colors.json&#x27;))):  # swatch colours rendered under the map lighting
+        x=mx+n*(sw+gap); d0.rectangle([x,yb-(base_h+n*step),x+sw,yb],fill=tuple(int(q) for q in col))
+    im=grade(raw,WP); dr=ImageDraw.Draw(im)
+    dr.text((mx,my),f&quot;{c[&#x27;title&#x27;]} Population Density&quot;,font=fT,fill=ink)
+    agg=&#x27;&#x27; if meta[&#x27;res&#x27;]==8 else &#x27;, summed from Kontur res-8&#x27;
+    dr.text((mx,my+int(U*0.055)),f&quot;{meta[&#x27;cells&#x27;]:,} H3 hexagons (~{meta[&#x27;cell_km2&#x27;]:.2f} km² each{agg}). Height is linear in people per km².&quot;,font=fS,fill=sub)
+    for n,lab in enumerate([&#x27;≤1&#x27;,&#x27;10&#x27;,&#x27;100&#x27;,&#x27;1,000&#x27;,&#x27;10,000+&#x27;]):
+        x=mx+n*(sw+gap); dr.rectangle([x,yb-(base_h+n*step),x+sw,yb],outline=(175,160,140),width=1)
+        w=dr.textlength(lab,font=fL); dr.text((x+sw/2-w/2,yb+int(U*0.006)),lab,font=fL,fill=ink)
+    lx2=mx+5*(sw+gap)+int(U*0.014); top=yb-(base_h+4*step)
+    # callout: what the stairs mean, and what the spike heights mean
+    d=np.load(f&#x27;{WORK}/{key}.npz&#x27;,allow_pickle=True); dens=d[&#x27;pop&#x27;]/d[&#x27;area&#x27;]; i=int(np.argmax(dens))
+    lon0,lat0,pcx,pcy=d[&#x27;proj&#x27;]; tr=Transformer.from_crs(4326,f&#x27;+proj=laea +lat_0={lat0} +lon_0={lon0} +units=km&#x27;,always_xy=True)
+    mxk,myk=d[&#x27;x&#x27;][i].mean()+pcx,d[&#x27;y&#x27;][i].mean()+pcy
+    near=min(c[&#x27;cities&#x27;],key=lambda q:np.hypot(*(np.array(tr.transform(q[1],q[2]))-[mxk,myk])))[0]
+    lines=[(&#x27;Each colour step is 10× denser&#x27;,fLb,ink),
+           (&#x27;Darkest blue (10,000+ people/km²) is 10,000× denser than darkest red (≤1).&#x27;,fL,sub),
+           (f&#x27;Spike height is linear: the tallest, in {near}, is {dens[i]:,.0f} people/km².&#x27;,fL,sub)]
+    y=top-int(U*0.002)
+    for t,f,col in lines: dr.text((lx2,y),t,font=f,fill=col); y+=int(f.size*1.45)
+    legend_bottom=max(y,yb+int(U*0.03))
+cr=(f&quot;Results: {c[&#x27;election&#x27;][&#x27;source&#x27;]}\n&quot; if &#x27;election&#x27; in c else &quot;&quot;)+f&quot;Data: Kontur Population (2023-11-01, CC BY 4.0) · {meta[&#x27;pop&#x27;]/1e6:,.1f} million people\nBoundary: {c[&#x27;credit&#x27;]} · Plan oblique view, {meta.get(&#x27;projection&#x27;,&#x27;Lambert azimuthal equal-area&#x27;)}\nRendered in Blender 5.2 Cycles (path-traced). Sun at {SUN_EL:g}° elevation from the west; all shadows are ray-traced from the geometry.&quot;
+dr.multiline_text((mx,H-my-int(U*(0.073 if &#x27;election&#x27; in c else 0.055))),cr,font=fC,fill=sub,spacing=int(U*0.004))
+# ---- city labels: bold name on a soft cream pill sitting just above each city&#x27;s skyline
+taken=[(0,0,W,legend_bottom+int(U*0.01)),(0,H-my-int(U*0.09),W,H)]
+def hit(b): return any(not(b[2]&lt;t[0] or b[0]&gt;t[2] or b[3]&lt;t[1] or b[1]&gt;t[3]) for t in taken)
+ov=Image.new(&#x27;RGBA&#x27;,im.size,(0,0,0,0)); do=ImageDraw.Draw(ov); texts=[]
+capH=fN.getbbox(&#x27;H&#x27;)[3]-fN.getbbox(&#x27;H&#x27;)[1]; padx,pady=fN.size*0.55,fN.size*0.42
+for name,px,py in meta[&#x27;labels&#x27;]:
+    l_,t_,r_,b_=fN.getbbox(name,anchor=&#x27;ls&#x27;); w=r_-l_; bw,bh=w+2*padx,capH+2*pady
+    for dx,dy in [(0,0),(0.55,0),(-0.55,0),(0,-1.1)]:
+        x=px-bw/2+dx*bw; y=py-U*0.010-bh+dy*bh; b=(x-3,y-3,x+bw+3,y+bh+3)
+        if not hit(b): break
+    else: continue
+    taken.append(b)
+    do.rounded_rectangle([x+U*0.0012,y+U*0.0018,x+bw+U*0.0012,y+bh+U*0.0018],radius=bh/2,fill=(40,28,18,55))   # soft drop shadow
+    do.rounded_rectangle([x,y,x+bw,y+bh],radius=bh/2,fill=(*cream,232),outline=(150,128,104,200),width=max(1,int(U/1400)))
+    texts.append((x+bw/2-(l_+r_)/2,y+bh/2+capH/2,name))         # baseline so capitals sit centred; ink box centred horizontally
+ov=ov.filter(ImageFilter.GaussianBlur(0)) ; im=Image.alpha_composite(im.convert(&#x27;RGBA&#x27;),ov).convert(&#x27;RGB&#x27;); dr=ImageDraw.Draw(im)
+for x,y,name in texts: dr.text((x,y),name,font=fN,fill=ink,anchor=&#x27;ls&#x27;)
+im.save(OUT,optimize=True)
+</pre></div></details>
+  <details><summary>pipeline/legend_render.py<span>render the swatch colours · <a href="https://github.com/stamen/prompted-population-maps/blob/main/pipeline/legend_render.py" target="_blank" rel="noopener">on GitHub</a></span></summary><div class="codebox"><button class="copy" type="button">Copy</button><pre># Render the 5 legend swatches as flat tiles under the identical material, sun, sky and AgX settings as render.py,
+# so each swatch shows exactly how a flat hexagon top of that density class appears in the map.
+import bpy, numpy as np, math, sys, json
+from mathutils import Vector
+import os; sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); from regions import WORK
+MODE=sys.argv[1] if len(sys.argv)&gt;1 else &#x27;density&#x27;
+OUT=f&#x27;{WORK}/legend_colors.json&#x27; if MODE==&#x27;density&#x27; else f&#x27;{WORK}/legend_colors_election.json&#x27;
+stops=np.array([0.0,1.0,1.8,2.6,3.4,4.15]); cols=np.array([[215,38,40],[232,84,66],[250,246,240],[244,246,250],[70,135,225],[25,90,215]])/255.
+bpy.ops.wm.read_factory_settings(use_empty=True); s=bpy.context.scene
+for n,v in enumerate([0,1,2,3,4]):
+    if MODE==&#x27;election&#x27;:
+        from regions import EL_STOPS, EL_COLS
+        rgb=np.array([np.interp([-0.6,-0.3,0,0.3,0.6][n],EL_STOPS,np.array(EL_COLS)[:,k]/255.) for k in range(3)])
+    else: rgb=np.array([np.interp(v,stops,cols[:,k]) for k in range(3)])
+    rgb=rgb; lin=np.where(rgb&lt;=0.04045,rgb/12.92,((rgb+0.055)/1.055)**2.4)
+    bpy.ops.mesh.primitive_plane_add(size=1.0,location=(n*1.5,0,0)); ob=bpy.context.object
+    m=bpy.data.materials.new(f&#x27;m{n}&#x27;); m.use_nodes=True; p=m.node_tree.nodes[&#x27;Principled BSDF&#x27;]
+    p.inputs[&#x27;Roughness&#x27;].default_value=0.55; p.inputs[&#x27;Base Color&#x27;].default_value=(*lin,1); ob.data.materials.append(m)
+sun=bpy.data.lights.new(&#x27;sun&#x27;,&#x27;SUN&#x27;); sun.energy=6.0; sun.angle=math.radians(0.6); sun.color=(1.0,0.93,0.84)
+so=bpy.data.objects.new(&#x27;sun&#x27;,sun); s.collection.objects.link(so)
+from regions import SUN_EL, SUN_AZ; elev=math.radians(SUN_EL); az=math.radians(SUN_AZ)
+so.rotation_euler=Vector((math.sin(az)*math.cos(elev),math.cos(az)*math.cos(elev),math.sin(elev))).to_track_quat(&#x27;Z&#x27;,&#x27;Y&#x27;).to_euler()
+w=bpy.data.worlds.new(&#x27;w&#x27;); s.world=w; w.use_nodes=True
+w.node_tree.nodes[&#x27;Background&#x27;].inputs[&#x27;Color&#x27;].default_value=(0.55,0.65,0.85,1); w.node_tree.nodes[&#x27;Background&#x27;].inputs[&#x27;Strength&#x27;].default_value=0.35
+cam=bpy.data.cameras.new(&#x27;c&#x27;); cam.type=&#x27;ORTHO&#x27;; cam.ortho_scale=7.5; co=bpy.data.objects.new(&#x27;c&#x27;,cam); s.collection.objects.link(co); s.camera=co
+tilt=math.radians(50); co.location=(3.0,-10*math.sin(tilt),10*math.cos(tilt)); co.rotation_euler=(tilt,0,0)   # same view angle as the map
+s.render.engine=&#x27;CYCLES&#x27;; s.cycles.samples=64; s.cycles.use_denoising=True; s.cycles.max_bounces=4
+s.render.resolution_x=750; s.render.resolution_y=150
+s.view_settings.view_transform=&#x27;AgX&#x27;; s.view_settings.look=&#x27;AgX - Medium High Contrast&#x27;
+s.render.filepath=f&#x27;{WORK}/legend_tiles.png&#x27;; bpy.ops.render.render(write_still=True)
+from PIL import Image
+a=np.asarray(Image.open(f&#x27;{WORK}/legend_tiles.png&#x27;).convert(&#x27;RGB&#x27;)).astype(float)
+res=[a[70:80,int((n*1.5-3.0+3.75)/7.5*750)-5:int((n*1.5-3.0+3.75)/7.5*750)+5].reshape(-1,3).mean(0).round().tolist() for n in range(5)]
+json.dump(res,open(OUT,&#x27;w&#x27;)); print(res)
+</pre></div></details>
+  <details><summary>pipeline/make_map.sh<span>one command per map · <a href="https://github.com/stamen/prompted-population-maps/blob/main/pipeline/make_map.sh" target="_blank" rel="noopener">on GitHub</a></span></summary><div class="codebox"><button class="copy" type="button">Copy</button><pre>#!/usr/bin/env bash
+# One command per map.   pipeline/make_map.sh &lt;region&gt; [preview|final]
+#   preview: 800 px, 16 samples (~20 s)     final: 3600 px, 64 samples (6-15 min on 4 CPU cores)
+set -euo pipefail
+HERE=&quot;$(cd &quot;$(dirname &quot;$0&quot;)&quot; &amp;&amp; pwd)&quot;; PY=&quot;${PYTHON:-python}&quot;; K=&quot;$1&quot;; MODE=&quot;${2:-preview}&quot;
+WORK=&quot;${POPMAPS_WORK:-$HERE/../work}&quot;; OUT=&quot;${POPMAPS_OUT:-$HERE/../out}&quot;; mkdir -p &quot;$WORK&quot; &quot;$OUT&quot;
+if [ &quot;$MODE&quot; = final ]; then W=3600; S=64; DST=&quot;$OUT/$K.png&quot;; else W=800; S=16; DST=&quot;$OUT/${K}_preview.png&quot;; fi
+&quot;$PY&quot; &quot;$HERE/legend_render.py&quot; &gt;/dev/null; &quot;$PY&quot; &quot;$HERE/legend_render.py&quot; election &gt;/dev/null   # swatches under the current sun
+[ -s &quot;$WORK/$K.npz&quot; ] || &quot;$PY&quot; &quot;$HERE/prep.py&quot; &quot;$K&quot;
+&quot;$PY&quot; &quot;$HERE/render.py&quot; &quot;$K&quot; $W $S &quot;$WORK/${K}_${MODE}_raw.png&quot; 2&gt;&amp;1 | grep -E &quot;render [0-9]|Error|Traceback&quot; || true
+&quot;$PY&quot; &quot;$HERE/annotate.py&quot; &quot;$K&quot; &quot;$WORK/${K}_${MODE}_raw.png&quot; &quot;$DST&quot;
+echo &quot;wrote $DST&quot;
+</pre></div></details>
+  <details><summary>pipeline/fetch_data.sh<span>download inputs · <a href="https://github.com/stamen/prompted-population-maps/blob/main/pipeline/fetch_data.sh" target="_blank" rel="noopener">on GitHub</a></span></summary><div class="codebox"><button class="copy" type="button">Copy</button><pre>#!/usr/bin/env bash
+# Download inputs into ./data (override with POPMAPS_DATA).
+#   pipeline/fetch_data.sh US IN FR GB CN HK MO DE CA     Kontur population files by ISO-2 code
+#   pipeline/fetch_data.sh --elections                    Texas 2026 Senate (county) + 2024 presidential (precinct)
+set -euo pipefail
+HERE=&quot;$(cd &quot;$(dirname &quot;$0&quot;)&quot; &amp;&amp; pwd)&quot;; D=&quot;${POPMAPS_DATA:-$HERE/../data}&quot;; mkdir -p &quot;$D/kontur&quot; &quot;$D/bnd&quot; &quot;$D/election/nyt&quot;
+get(){ [ -s &quot;$2&quot; ] || { echo &quot;-&gt; $2&quot;; curl -fSL --retry 3 -o &quot;$2&quot; &quot;$1&quot;; }; }
+NE=https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson
+for f in ne_10m_admin_0_countries ne_10m_admin_1_states_provinces ne_10m_lakes; do get &quot;$NE/$f.geojson&quot; &quot;$D/bnd/$f.geojson&quot;; done
+get https://www2.census.gov/geo/tiger/GENZ2023/shp/cb_2023_us_state_5m.zip  &quot;$D/bnd/cb_2023_us_state_5m.zip&quot;
+get https://www2.census.gov/geo/tiger/GENZ2023/shp/cb_2023_us_county_5m.zip &quot;$D/bnd/cb_2023_us_county_5m.zip&quot;
+for c in &quot;$@&quot;; do
+  if [ &quot;$c&quot; = &quot;--elections&quot; ]; then
+    python &quot;$HERE/fetch_tx_senate_2026.py&quot; &quot;$D/election/tx_senate_2026_county.csv&quot;
+    for x in geojson csv; do get &quot;https://int.nyt.com/newsgraphics/elections/map-data/2024/national/TX-precincts-with-results.$x.gz&quot; &quot;$D/election/nyt/TX.$x.gz&quot;
+      [ -s &quot;$D/election/nyt/TX.$x&quot; ] || gunzip -kf &quot;$D/election/nyt/TX.$x.gz&quot;; done
+    continue
+  fi
+  # Kontur Population 2023-11-01, one GeoPackage per country (same files as on data.humdata.org)
+  [ -s &quot;$D/kontur/$c.gpkg&quot; ] || { echo &quot;-&gt; kontur $c&quot;; curl -fSL --retry 3 &quot;https://geodata-eu-central-1-kontur-public.s3.amazonaws.com/kontur_datasets/kontur_population_${c}_20231101.gpkg.gz&quot; | gunzip &gt; &quot;$D/kontur/$c.gpkg&quot;; }
+done
+</pre></div></details>
+  <details><summary>pipeline/fetch_tx_senate_2026.py<span>2026 Senate county results · <a href="https://github.com/stamen/prompted-population-maps/blob/main/pipeline/fetch_tx_senate_2026.py" target="_blank" rel="noopener">on GitHub</a></span></summary><div class="codebox"><button class="copy" type="button">Copy</button><pre>&quot;&quot;&quot;Texas 2026 U.S. Senate results by county, parsed from the Wikipedia article&#x27;s county table.
+Unofficial returns compiled from county reports; replace with the Secretary of State canvass when it is certified.
+usage: python fetch_tx_senate_2026.py out.csv&quot;&quot;&quot;
+import sys, io, urllib.request, pandas as pd
+URL=&#x27;https://en.wikipedia.org/w/index.php?title=2026_United_States_Senate_election_in_Texas&amp;action=render&#x27;
+html=urllib.request.urlopen(urllib.request.Request(URL,headers={&#x27;User-Agent&#x27;:&#x27;prompted-population-maps&#x27;})).read().decode()
+t=[t for t in pd.read_html(io.StringIO(html)) if len(t)&gt;250 and t.astype(str).apply(lambda c:c.str.contains(&#x27;Talarico&#x27;)).any().any()][0]
+t=t.iloc[:,:12]; t.columns=[&#x27;county&#x27;,&#x27;d&#x27;,&#x27;dp&#x27;,&#x27;r&#x27;,&#x27;rp&#x27;,&#x27;l&#x27;,&#x27;lp&#x27;,&#x27;o&#x27;,&#x27;op&#x27;,&#x27;m&#x27;,&#x27;mp&#x27;,&#x27;tot&#x27;]
+num=lambda c: pd.to_numeric(t[c].astype(str).str.replace(&#x27;,&#x27;,&#x27;&#x27;),errors=&#x27;coerce&#x27;)
+for c in [&#x27;d&#x27;,&#x27;r&#x27;,&#x27;l&#x27;,&#x27;o&#x27;,&#x27;tot&#x27;]: t[c]=num(c)
+t=t[t.d.notna() &amp; ~t.county.astype(str).str.contains(&#x27;Total|County&#x27;)]
+assert len(t)==254, f&#x27;expected 254 counties, got {len(t)}&#x27;
+assert (t.d+t.r+t.l+t.o==t.tot).all(), &#x27;county columns do not add up&#x27;
+t[[&#x27;county&#x27;,&#x27;d&#x27;,&#x27;r&#x27;,&#x27;l&#x27;,&#x27;o&#x27;,&#x27;tot&#x27;]].astype({&#x27;d&#x27;:int,&#x27;r&#x27;:int,&#x27;l&#x27;:int,&#x27;o&#x27;:int,&#x27;tot&#x27;:int}).to_csv(sys.argv[1],index=False)
+print(f&quot;254 counties  D {t.d.sum():,.0f}  R {t.r.sum():,.0f}  total {t.tot.sum():,.0f} -&gt; {sys.argv[1]}&quot;)
+</pre></div></details>
+
+  <p class="muted small">Code MIT licensed. Data © Kontur (CC BY 4.0), Natural Earth (public domain), US Census Bureau (public domain), The New York Times (non-commercial). Fonts: Inter (SIL OFL 1.1). Rendered with Blender (GPL).</p>
+</section>
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(function(b){
+  b.addEventListener('click',function(){
+    var pre=b.parentNode.querySelector('pre'); var t=pre.textContent;
+    function sel(){var r=document.createRange();r.selectNodeContents(pre);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Selected, press Ctrl+C';}
+    try{navigator.clipboard.writeText(t).then(function(){b.textContent='Copied';setTimeout(function(){b.textContent='Copy'},1600)},sel)}catch(e){sel()}
+  });
+});
+</script>
+</body>
+</html>

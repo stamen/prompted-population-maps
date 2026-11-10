@@ -1,0 +1,82 @@
+{
+ "measured": {
+  "as_of": "2026-11-10 17:52 UTC (repo setup included)",
+  "output_tokens": 218110,
+  "input_tokens": 46944,
+  "cache_write_tokens": 541526,
+  "cache_read_tokens": 49045711,
+  "cost_usd": 18.51
+ },
+ "phases": [
+  {
+   "phase": "Texas: first request, setup, first render",
+   "share": "~22.5k"
+  },
+  {
+   "phase": "Texas: brighter colours, taller, warm ground, labels",
+   "share": "~19k"
+  },
+  {
+   "phase": "Texas: uninhabited land red",
+   "share": "~2.5k"
+  },
+  {
+   "phase": "Texas: names only, taller, five swatches",
+   "share": "~8k"
+  },
+  {
+   "phase": "Texas: plan oblique, title, grade, rendered legend",
+   "share": "~20k"
+  },
+  {
+   "phase": "Texas subtotal",
+   "share": "~72k",
+   "sum": true
+  },
+  {
+   "phase": "Generalise the pipeline to any region",
+   "share": "~13k"
+  },
+  {
+   "phase": "Seven regions: config, previews, fixes",
+   "share": "~11.5k"
+  },
+  {
+   "phase": "Ontario lakes",
+   "share": "~4.5k"
+  },
+  {
+   "phase": "Portable scripts and first shared page",
+   "share": "~19k"
+  },
+  {
+   "phase": "Readable labels and stepped legend",
+   "share": "~5k"
+  },
+  {
+   "phase": "2026 Senate results by county",
+   "share": "~22k"
+  },
+  {
+   "phase": "County-coloured land",
+   "share": "~6k"
+  },
+  {
+   "phase": "Precinct search and 2024 precinct map",
+   "share": "~18k"
+  },
+  {
+   "phase": "Sun at 15°, centred labels",
+   "share": "~9k"
+  },
+  {
+   "phase": "Repo, agent guide and Pages site",
+   "share": "~30k"
+  },
+  {
+   "phase": "Each additional region, once generalised",
+   "share": "~2k",
+   "sum": true
+  }
+ ]
+}

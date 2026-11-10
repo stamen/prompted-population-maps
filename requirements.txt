@@ -1,0 +1,11 @@
+# Tested with Python 3.13 (bpy 5.2 wheels target 3.13). Blender installs from PyPI as the bpy module.
+bpy==5.2.3
+geopandas==1.2.0
+pyogrio==0.13.0
+pyproj==3.8.0
+h3==4.5.0
+shapely==2.2.0
+numpy==2.5.4
+pandas==3.1.1
+pillow==13.0.0
+lxml==6.1.3
