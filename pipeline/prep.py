@@ -50,7 +50,7 @@ if 'election' in c:
     lat_,lon_=np.array([h3.cell_to_latlng(x) for x in cells]).T
     pts=gpd.GeoDataFrame(geometry=gpd.points_from_xy(lon_,lat_),crs=4326)
     j=gpd.sjoin_nearest(pts.to_crs(3083),co[['m','geometry']].to_crs(3083),how='left').groupby(level=0).first()   # nearest handles edge cells
-    # county-coloured slab: triangulate each county (holes/islands kept) and keep its outline rings for walls
+    # county-colored slab: triangulate each county (holes/islands kept) and keep its outline rings for walls
     ct,ctm,cr,crm=[],[],[],[]
     for g_,m_ in zip(co.geometry,co.m):
         gq=shapely.ops.transform(lambda x,y:tr.transform(x,y),g_)

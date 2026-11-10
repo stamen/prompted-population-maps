@@ -8,11 +8,11 @@ d=np.load(f'{WORK}/{key}.npz',allow_pickle=True); c=R[key]
 X,Y=d['x'],d['y']; dens=d['pop']/d['area']; n=len(dens)
 x0,y0,x1,y1=d['bounds']; S=max(x1-x0,y1-y0)          # all dimensions scale from the Texas design (S=1250 km)
 HMAX=0.224*S; h=0.0002*S+dens/dens.max()*HMAX; SLAB=0.0024*S
-# colour: same absolute log-density ramp as Texas, so maps are comparable
+# color: same absolute log-density ramp as Texas, so maps are comparable
 ld=np.log10(np.clip(dens,1,None)); stops=np.array([0.0,1.0,1.8,2.6,3.4,4.15])
 cols=np.array([[215,38,40],[232,84,66],[250,246,240],[244,246,250],[70,135,225],[25,90,215]])/255.
 rgb=np.stack([np.interp(ld,stops,cols[:,k]) for k in range(3)],1)
-if 'margin' in d.files:   # colour = county two-party margin (D-R)/(D+R): red Republican, blue Democratic
+if 'margin' in d.files:   # color = county two-party margin (D-R)/(D+R): red Republican, blue Democratic
     from regions import EL_STOPS, EL_COLS
     ec=np.array(EL_COLS)/255.; rgb=np.stack([np.interp(d['margin'],EL_STOPS,ec[:,k]) for k in range(3)],1)
 lin=np.where(rgb<=0.04045,rgb/12.92,((rgb+0.055)/1.055)**2.4)
@@ -39,7 +39,7 @@ def elcol(m):   # election ramp in linear RGB
     from regions import EL_STOPS, EL_COLS
     ec=np.array(EL_COLS)/255.; r=np.stack([np.interp(m,EL_STOPS,ec[:,k]) for k in range(3)],-1)
     return np.where(r<=0.04045,r/12.92,((r+0.055)/1.055)**2.4)
-if 'ctris' in d.files:   # election maps: slab built from county polygons, each in its county's result colour
+if 'ctris' in d.files:   # election maps: slab built from county polygons, each in its county's result color
     T=d['ctris']; nt=len(T); C=elcol(d['ctm'])
     vt=[np.dstack([T,np.zeros((nt,3,1))]).reshape(-1,3),np.dstack([T,np.full((nt,3,1),-SLAB)]).reshape(-1,3)]
     ft=[(3*i,3*i+1,3*i+2) for i in range(nt)]+[(3*(nt+i)+2,3*(nt+i)+1,3*(nt+i)) for i in range(nt)]; fc=list(C)+list(C)

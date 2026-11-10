@@ -1,4 +1,4 @@
-# Render the 5 legend swatches as flat tiles under the identical material, sun, sky and AgX settings as render.py,
+# Render the 5 legend swatches as flat tiles under the identical material, sun, sky, and AgX settings as render.py,
 # so each swatch shows exactly how a flat hexagon top of that density class appears in the map.
 import bpy, numpy as np, math, sys, json
 from mathutils import Vector

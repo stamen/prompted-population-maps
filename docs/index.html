@@ -115,7 +115,7 @@ details[open] summary{border-bottom:1px solid var(--rule)}
   <div class="stack col">
     <span class="eyebrow">Population density</span>
     <h2>Eight maps, one pipeline</h2>
-    <p class="muted">Click a map for the full 3600-pixel image. Heights are linear and normalised to each map's densest cell, so compare colours across maps, not heights.</p>
+    <p class="muted">Click a map for the full 3600-pixel image. Heights are linear and normalized to each map's densest cell, so compare colors across maps, not heights.</p>
   </div>
   <div class="gallery">
     <figure><a class="plate" href="full/texas.jpg" target="_blank" rel="noopener"><img src="img/texas.jpg" alt="Texas, raytraced 3D hexagon map" width="1600" height="1777" loading="lazy"></a>
@@ -142,7 +142,7 @@ details[open] summary{border-bottom:1px solid var(--rule)}
   <div class="stack col">
     <span class="eyebrow">Votes on population</span>
     <h2>Election results draped on the same spikes</h2>
-    <p class="muted">The height is still people per km². The colour is the two-party margin of the county or precinct each hexagon falls in, from R+60 (dark red) to D+60 (dark blue), so the tall spikes show where the votes were cast.</p>
+    <p class="muted">The height is still people per km². The color is the two-party margin of the county or precinct each hexagon falls in, from R+60 (dark red) to D+60 (dark blue), so the tall spikes show where the votes were cast.</p>
   </div>
   <div class="gallery">
     <figure><a class="plate" href="full/texas_senate.jpg" target="_blank" rel="noopener"><img src="img/texas_senate.jpg" alt="Texas 2026 U.S. Senate Results, raytraced 3D hexagon map" width="1600" height="1777" loading="lazy"></a>
@@ -162,29 +162,29 @@ details[open] summary{border-bottom:1px solid var(--rule)}
   </div>
   <div class="timeline">
     <article class="step"><a class="plate" href="img/history/i0.jpg" target="_blank" rel="noopener"><img src="img/history/i0.jpg" alt="Texas map: first test render" width="800" height="640" loading="lazy"></a>
-      <div class="stack"><h3>First test render</h3><p class="ask">“Give me a population density map of Texas… extruded… dramatic raytraced shadows… red-white-blue. Use real data, and real shadows.”</p><p>An 800 px, 16-sample check of the pipeline: 317,903 Kontur hexagons became 2.2 million faces and path-traced in 8 seconds. Peaks were capped at 42 km and the base was light grey, so it read as flat and the white middle class blended into the base.</p></div></article>
+      <div class="stack"><h3>First test render</h3><p class="ask">“Give me a population density map of Texas… extruded… dramatic raytraced shadows… red-white-blue. Use real data, and real shadows.”</p><p>An 800 px, 16-sample check of the pipeline: 317,903 Kontur hexagons became 2.2 million faces and path-traced in 8 seconds. Peaks were capped at 42 km and the base was light gray, so it read as flat and the white middle class blended into the base.</p></div></article>
     <article class="step"><a class="plate" href="img/history/i1.jpg" target="_blank" rel="noopener"><img src="img/history/i1.jpg" alt="Texas map: first full render" width="1100" height="825" loading="lazy"></a>
-      <div class="stack"><h3>First full render</h3><p class="ask">“(first delivered map)”</p><p>Peaks raised to 110 km and the sun lowered to 7.5° from the west-northwest so shadows run east across the state. Charcoal base, grey ground, gradient legend, title “Where 30 million people live”.</p></div></article>
-    <article class="step"><a class="plate" href="img/history/i2.jpg" target="_blank" rel="noopener"><img src="img/history/i2.jpg" alt="Texas map: brighter, taller, warmer, labelled" width="1100" height="825" loading="lazy"></a>
-      <div class="stack"><h3>Brighter, taller, warmer, labelled</h3><p class="ask">“Trim the scale so the zero point is a brighter red and the top is a brighter blue… boost the vertical scale… lighten and warm up the background… add annotation for the major city spikes.”</p><p>Darkest ends of the ramp trimmed, peaks to 180 km, sand ground, twelve cities with leader lines and peak densities. Labels anchor on the visible skyline (25th-tallest nearby cell) because the densest cell is an invisible needle.</p></div></article>
+      <div class="stack"><h3>First full render</h3><p class="ask">“(first delivered map)”</p><p>Peaks raised to 110 km and the sun lowered to 7.5° from the west-northwest so shadows run east across the state. Charcoal base, gray ground, gradient legend, title “Where 30 million people live”.</p></div></article>
+    <article class="step"><a class="plate" href="img/history/i2.jpg" target="_blank" rel="noopener"><img src="img/history/i2.jpg" alt="Texas map: brighter, taller, warmer, labeled" width="1100" height="825" loading="lazy"></a>
+      <div class="stack"><h3>Brighter, taller, warmer, labeled</h3><p class="ask">“Trim the scale so the zero point is a brighter red and the top is a brighter blue… boost the vertical scale… lighten and warm up the background… add annotation for the major city spikes.”</p><p>Darkest ends of the ramp trimmed, peaks to 180 km, sand ground, and twelve cities with leader lines and peak densities. Labels anchor on the visible skyline (25th-tallest nearby cell) because the densest cell is an invisible needle.</p></div></article>
     <article class="step"><a class="plate" href="img/history/i3.jpg" target="_blank" rel="noopener"><img src="img/history/i3.jpg" alt="Texas map: uninhabited land in red" width="1100" height="825" loading="lazy"></a>
-      <div class="stack"><h3>Uninhabited land in red</h3><p class="ask">“The gray near-zero population background of the map should be red too.”</p><p>Kontur only lists inhabited hexagons, so empty land showed the base slab. The slab took the exact colour of the lowest class.</p></div></article>
+      <div class="stack"><h3>Uninhabited land in red</h3><p class="ask">“The gray near-zero population background of the map should be red too.”</p><p>Kontur only lists inhabited hexagons, so empty land showed the base slab. The slab took the exact color of the lowest class.</p></div></article>
     <article class="step"><a class="plate" href="img/history/i4.jpg" target="_blank" rel="noopener"><img src="img/history/i4.jpg" alt="Texas map: names only, five swatches" width="1100" height="825" loading="lazy"></a>
-      <div class="stack"><h3>Names only, five swatches</h3><p class="ask">“Remove the density numbers… remove the leader lines… boost the vertical scale even more… simplify the legend into just 5 swatches.”</p><p>Peaks to 280 km (2.5× the first render), plain names on each skyline, five swatches at 1, 10, 100, 1,000 and 10,000+ people per km².</p></div></article>
+      <div class="stack"><h3>Names only, five swatches</h3><p class="ask">“Remove the density numbers… remove the leader lines… boost the vertical scale even more… simplify the legend into just 5 swatches.”</p><p>Peaks to 280 km (2.5× the first render), plain names on each skyline, five swatches at 1, 10, 100, 1,000, and 10,000+ people per km².</p></div></article>
     <article class="step"><a class="plate" href="img/history/i5.jpg" target="_blank" rel="noopener"><img src="img/history/i5.jpg" alt="Texas map: plan oblique view" width="1100" height="1283" loading="lazy"></a>
       <div class="stack"><h3>Plan oblique view</h3><p class="ask">“Stretch the image vertically so the image is closer to the proportions of Texas as viewed top down, but keep the perspective view.”</p><p>Blender renders with wide pixels (aspect 1/cos 50°): the ground keeps its top-down shape while heights still rise at the 50° view. Lighting is untouched and label positions come from Blender’s own camera projection.</p></div></article>
-    <article class="step"><a class="plate" href="img/history/i6.jpg" target="_blank" rel="noopener"><img src="img/history/i6.jpg" alt="Texas map: simpler title and a colour grade" width="1600" height="1866" loading="lazy"></a>
-      <div class="stack"><h3>Simpler title and a colour grade</h3><p class="ask">“Change the title to a simpler ‘Texas Population Density’… contrast, brightness, or other levels adjustments… bright and clean-looking.”</p><p>Levels put the sand near white, a gentle S-curve kept shadows strong, greys were neutralised and reds pulled back from neon. Legend swatches are rendered as flat tiles under the map’s lighting so they match after the grade.</p></div></article>
+    <article class="step"><a class="plate" href="img/history/i6.jpg" target="_blank" rel="noopener"><img src="img/history/i6.jpg" alt="Texas map: simpler title and a color grade" width="1600" height="1866" loading="lazy"></a>
+      <div class="stack"><h3>Simpler title and a color grade</h3><p class="ask">“Change the title to a simpler ‘Texas Population Density’… contrast, brightness, or other levels adjustments… bright and clean-looking.”</p><p>Levels put the sand near white, a gentle S-curve kept shadows strong, grays were neutralized, and reds pulled back from neon. Legend swatches are rendered as flat tiles under the map’s lighting so they match after the grade.</p></div></article>
     <article class="step"><a class="plate" href="img/history/i7.jpg" target="_blank" rel="noopener"><img src="img/history/i7.jpg" alt="Texas map: readable labels and a stepped legend" width="1100" height="1283" loading="lazy"></a>
       <div class="stack"><h3>Readable labels and a stepped legend</h3><p class="ask">“The place labels need adjustment so they’re a bit easier to read. Also the scale needs an extra callout… or make each swatch a different height.”</p><p>Bold names on cream pills with a faint outline and shadow. The swatches rise one step per 10×, with callouts: darkest blue is 10,000× denser than darkest red, and heights are linear (the tallest spike’s real value is printed).</p></div></article>
     <article class="step"><a class="plate" href="img/history/i8.jpg" target="_blank" rel="noopener"><img src="img/history/i8.jpg" alt="Texas map: 2026 senate results draped on population" width="1100" height="1221" loading="lazy"></a>
-      <div class="stack"><h3>2026 Senate results draped on population</h3><p class="ask">“Source county level election results from the 2026 Texas US Senate race and drape those colors on the population map instead of coloring by density.”</p><p>254-county results (Wikipedia, spot-checked against Decision Desk HQ and the Dallas Morning News). Each hexagon takes its county’s two-party margin; uninhabited land is neutral grey.</p></div></article>
-    <article class="step"><a class="plate" href="img/history/i9.jpg" target="_blank" rel="noopener"><img src="img/history/i9.jpg" alt="Texas map: county-coloured land" width="1100" height="1221" loading="lazy"></a>
-      <div class="stack"><h3>County-coloured land</h3><p class="ask">“In this case I would color the slab according the county election results, too.”</p><p>The land slab is built from the 254 Census county polygons, each in its result colour, so empty counties read correctly and spikes show where the votes are.</p></div></article>
+      <div class="stack"><h3>2026 Senate results draped on population</h3><p class="ask">“Source county level election results from the 2026 Texas US Senate race and drape those colors on the population map instead of coloring by density.”</p><p>254-county results (Wikipedia, spot-checked against Decision Desk HQ and the Dallas Morning News). Each hexagon takes its county’s two-party margin; uninhabited land is neutral gray.</p></div></article>
+    <article class="step"><a class="plate" href="img/history/i9.jpg" target="_blank" rel="noopener"><img src="img/history/i9.jpg" alt="Texas map: county-colored land" width="1100" height="1221" loading="lazy"></a>
+      <div class="stack"><h3>County-colored land</h3><p class="ask">“In this case I would color the slab according the county election results, too.”</p><p>The land slab is built from the 254 Census county polygons, each in its result color, so empty counties read correctly and spikes show where the votes are.</p></div></article>
     <article class="step"><a class="plate" href="img/history/i10.jpg" target="_blank" rel="noopener"><img src="img/history/i10.jpg" alt="Texas map: precinct-level 2024 results" width="1100" height="1221" loading="lazy"></a>
       <div class="stack"><h3>Precinct-level 2024 results</h3><p class="ask">“Search the web for better resolution results, like at the precinct level… you can probably find it for the 2024 presidential results.”</p><p>2026 precinct data is not yet published statewide, so this uses the NYT’s 9,718 Texas precincts for 2024 (totals within 0.1% of certified). Cities split into blue cores and red suburbs; the Rio Grande Valley shows the 2024 shift.</p></div></article>
-    <article class="step"><a class="plate" href="img/history/i11.jpg" target="_blank" rel="noopener"><img src="img/history/i11.jpg" alt="Texas map: sun at 15°, centred labels" width="1100" height="1221" loading="lazy"></a>
-      <div class="stack"><h3>Sun at 15°, centred labels</h3><p class="ask">“Your city labels aren&#x27;t correctly centered in their white background pill shapes… bring [the light] up higher above the horizon, try 15º.”</p><p>Names are centred on cap height. Shadows are half as long. The grade now measures the bare ground in each render, so the background stays the same cream at any sun angle.</p></div></article>
+    <article class="step"><a class="plate" href="img/history/i11.jpg" target="_blank" rel="noopener"><img src="img/history/i11.jpg" alt="Texas map: sun at 15°, centered labels" width="1100" height="1221" loading="lazy"></a>
+      <div class="stack"><h3>Sun at 15°, centered labels</h3><p class="ask">“Your city labels aren&#x27;t correctly centered in their white background pill shapes… bring [the light] up higher above the horizon, try 15º.”</p><p>Names are centered on cap height. Shadows are half as long. The grade now measures the bare ground in each render, so the background stays the same cream at any sun angle.</p></div></article>
 
   </div>
 </section>
@@ -193,7 +193,7 @@ details[open] summary{border-bottom:1px solid var(--rule)}
   <div class="stack col">
     <span class="eyebrow">Pick up where we left off</span>
     <h2>Make your own map</h2>
-    <p>Clone the repo and either hand it to your own coding agent, or run the commands yourself. <code>AGENTS.md</code> tells any LLM (Claude, Codex, Gemini, Cursor and others) how the pipeline works, what not to break, and how to check its work.</p>
+    <p>Clone the repo and either hand it to your own coding agent, or run the commands yourself. <code>AGENTS.md</code> tells any LLM (Claude, Codex, Gemini, Cursor, and others) how the pipeline works, what not to break, and how to check its work.</p>
   </div>
   <div class="prompt">
     <span class="eyebrow">A prompt for your agent</span>
@@ -228,11 +228,11 @@ python docs/build_site.py              # refresh this site</pre>
       <tr><th>To change</th><th>File</th><th>Look for</th></tr>
       <tr><td>A region, its cities, its data</td><td>pipeline/regions.py</td><td>one entry in <code>R</code></td></tr>
       <tr><td>Sun height and direction</td><td>pipeline/regions.py</td><td><code>SUN_EL</code>, <code>SUN_AZ</code>. Lower elevation means longer shadows</td></tr>
-      <tr><td>Density colour ramp</td><td>pipeline/render.py, pipeline/legend_render.py</td><td><code>stops</code>, <code>cols</code>. Change both, then re-run legend_render.py</td></tr>
-      <tr><td>Election colour ramp</td><td>pipeline/regions.py</td><td><code>EL_STOPS</code>, <code>EL_COLS</code></td></tr>
+      <tr><td>Density color ramp</td><td>pipeline/render.py, pipeline/legend_render.py</td><td><code>stops</code>, <code>cols</code>. Change both, then re-run legend_render.py</td></tr>
+      <tr><td>Election color ramp</td><td>pipeline/regions.py</td><td><code>EL_STOPS</code>, <code>EL_COLS</code></td></tr>
       <tr><td>Height exaggeration</td><td>pipeline/render.py</td><td><code>HMAX=0.224*S</code> (S = region extent in km)</td></tr>
       <tr><td>View tilt</td><td>pipeline/render.py, pipeline/legend_render.py</td><td><code>tilt</code>; <code>pixel_aspect_x = 1/cos(tilt)</code> gives the plan-oblique view</td></tr>
-      <tr><td>Ground and uninhabited land colour</td><td>pipeline/render.py</td><td><code>mat('ground', …)</code>, <code>slabm</code></td></tr>
+      <tr><td>Ground and uninhabited land color</td><td>pipeline/render.py</td><td><code>mat('ground', …)</code>, <code>slabm</code></td></tr>
       <tr><td>Brightness, contrast, saturation</td><td>pipeline/annotate.py</td><td><code>grade()</code>; the white point is measured from the bare ground</td></tr>
       <tr><td>Title, legend, callouts, labels</td><td>pipeline/annotate.py</td><td>text blocks; label pills and collision list <code>taken</code></td></tr>
       <tr><td>Margins and framing</td><td>pipeline/render.py</td><td><code>fx0, fx1, fy0, fy1</code>. Extra room on the east is for shadows</td></tr>
@@ -249,8 +249,8 @@ python docs/build_site.py              # refresh this site</pre>
     <div class="card"><h3>The densest cell is a needle</h3><p>A city's densest hexagon is one pixel wide and towers over the visible skyline. Labels anchor on the 25th-tallest cell nearby instead, which is where the eye sees the city.</p></div>
     <div class="card b"><h3>H3 cells are not always hexagons</h3><p>Resolution-7 cells that straddle an icosahedron face edge carry up to 10 boundary vertices. <code>prep.py</code> keeps the six sharpest corners; pentagons are padded to six.</p></div>
     <div class="card"><h3>Lakes need two polygons</h3><p>Clip the population with the full provincial boundary and build the land from the lake-cut shape. Clipping data with 1:10m lake shorelines dropped 780,000 Ontario lakeshore residents.</p></div>
-    <div class="card b"><h3>Legend colours must be rendered</h3><p>Lighting and tone mapping change how each colour looks. The swatches are flat tiles rendered under the identical sun and sky, then put through the same grade as the map.</p></div>
-    <div class="card"><h3>Dense countries look different</h3><p>Germany, the UK and India are blue almost everywhere because rural density is in the hundreds per km². England's 99th-percentile cell is a quarter of its maximum, so its field is uniformly tall. That is the data.</p></div>
+    <div class="card b"><h3>Legend colors must be rendered</h3><p>Lighting and tone mapping change how each color looks. The swatches are flat tiles rendered under the identical sun and sky, then put through the same grade as the map.</p></div>
+    <div class="card"><h3>Dense countries look different</h3><p>Germany, the UK, and India are blue almost everywhere because rural density is in the hundreds per km². England's 99th-percentile cell is a quarter of its maximum, so its field is uniformly tall. That is the data.</p></div>
     <div class="card b"><h3>Check totals, and check sources</h3><p><code>prep.py</code> prints the population it kept: Texas 29.95M, Germany 83.5M, India 1.43B, China 1.43B all match official figures. Election totals were checked against certified or independently reported numbers.</p></div>
   </div>
 </section>
@@ -269,7 +269,7 @@ python docs/build_site.py              # refresh this site</pre>
     </div>
     <div class="stack" style="gap:10px">
       <h3>Estimated by phase</h3>
-      <div class="tbl"><table><tr><th>Phase</th><th class="r">New tokens</th></tr><tr><td>Texas: first request, setup, first render</td><td class="r">~22.5k</td></tr><tr><td>Texas: brighter colours, taller, warm ground, labels</td><td class="r">~19k</td></tr><tr><td>Texas: uninhabited land red</td><td class="r">~2.5k</td></tr><tr><td>Texas: names only, taller, five swatches</td><td class="r">~8k</td></tr><tr><td>Texas: plan oblique, title, grade, rendered legend</td><td class="r">~20k</td></tr><tr class=sum><td>Texas subtotal</td><td class="r">~72k</td></tr><tr><td>Generalise the pipeline to any region</td><td class="r">~13k</td></tr><tr><td>Seven regions: config, previews, fixes</td><td class="r">~11.5k</td></tr><tr><td>Ontario lakes</td><td class="r">~4.5k</td></tr><tr><td>Portable scripts and first shared page</td><td class="r">~19k</td></tr><tr><td>Readable labels and stepped legend</td><td class="r">~5k</td></tr><tr><td>2026 Senate results by county</td><td class="r">~22k</td></tr><tr><td>County-coloured land</td><td class="r">~6k</td></tr><tr><td>Precinct search and 2024 precinct map</td><td class="r">~18k</td></tr><tr><td>Sun at 15°, centred labels</td><td class="r">~9k</td></tr><tr><td>Repo, agent guide and Pages site</td><td class="r">~30k</td></tr><tr class=sum><td>Each additional region, once generalised</td><td class="r">~2k</td></tr></table></div>
+      <div class="tbl"><table><tr><th>Phase</th><th class="r">New tokens</th></tr><tr><td>Texas: first request, setup, first render</td><td class="r">~22.5k</td></tr><tr><td>Texas: brighter colors, taller, warm ground, labels</td><td class="r">~19k</td></tr><tr><td>Texas: uninhabited land red</td><td class="r">~2.5k</td></tr><tr><td>Texas: names only, taller, five swatches</td><td class="r">~8k</td></tr><tr><td>Texas: plan oblique, title, grade, rendered legend</td><td class="r">~20k</td></tr><tr class=sum><td>Texas subtotal</td><td class="r">~72k</td></tr><tr><td>Generalize the pipeline to any region</td><td class="r">~13k</td></tr><tr><td>Seven regions: config, previews, fixes</td><td class="r">~11.5k</td></tr><tr><td>Ontario lakes</td><td class="r">~4.5k</td></tr><tr><td>Portable scripts and first shared page</td><td class="r">~19k</td></tr><tr><td>Readable labels and stepped legend</td><td class="r">~5k</td></tr><tr><td>2026 Senate results by county</td><td class="r">~22k</td></tr><tr><td>County-colored land</td><td class="r">~6k</td></tr><tr><td>Precinct search and 2024 precinct map</td><td class="r">~18k</td></tr><tr><td>Sun at 15°, centered labels</td><td class="r">~9k</td></tr><tr><td>Repo, agent guide, and Pages site</td><td class="r">~30k</td></tr><tr class=sum><td>Each additional region, once generalized</td><td class="r">~2k</td></tr></table></div>
     </div>
   </div>
   <p class="col muted small">The first map took about a third of the session. Once the pipeline was general, a new region cost about 2k new tokens (one config entry plus reviewing one preview) and 6–15 minutes of rendering.</p>
@@ -290,7 +290,7 @@ Read this file, then `README.md`. Everything you need to reproduce or extend the
 
 3D population maps: every inhabited H3 hexagon from Kontur Population is extruded to a height that is
 **linear in people per km²**, then path-traced in Blender Cycles (via the `bpy` Python module) under a low sun,
-so shadows are real ray-traced shadows. Colour is either population density (log scale) or an election
+so shadows are real ray-traced shadows. Color is either population density (log scale) or an election
 result (two-party margin, county or precinct), draped over the same population geometry.
 
 ## Setup
@@ -313,7 +313,7 @@ pipeline/make_map.sh germany final     # 3600 px, 64 samples, 6-15 min on 4 core
 python docs/build_site.py              # rebuild the GitHub Pages site from out/*.png and pipeline/*
 ```
 
-`make_map.sh` runs, in order: `legend_render.py` (swatch colours under the current sun), `prep.py` (only if
+`make_map.sh` runs, in order: `legend_render.py` (swatch colors under the current sun), `prep.py` (only if
 `work/&lt;region&gt;.npz` is missing), `render.py`, `annotate.py`. Delete `work/&lt;region&gt;.npz` after changing anything
 that `prep.py` reads (boundaries, clipping, resolution, election data).
 
@@ -321,11 +321,11 @@ that `prep.py` reads (boundaries, clipping, resolution, election data).
 
 | Path | Role |
 |---|---|
-| `pipeline/regions.py` | **All per-map configuration**, paths, sun angle (`SUN_EL`, `SUN_AZ`), election colour ramp |
+| `pipeline/regions.py` | **All per-map configuration**, paths, sun angle (`SUN_EL`, `SUN_AZ`), election color ramp |
 | `pipeline/prep.py` | Clip Kontur cells to the boundary, aggregate to H3 res 7 for regions wider than 2,000 km, project (Lambert azimuthal equal-area), join election results, write `work/&lt;region&gt;.npz` |
 | `pipeline/render.py` | Build the Blender scene (hex prisms, land slab, ground, sun, sky, plan-oblique camera), export label anchors, path-trace |
-| `pipeline/annotate.py` | Colour grade, title, legend, callouts, credits, city labels with collision avoidance |
-| `pipeline/legend_render.py` | Render flat swatch tiles under the map&#x27;s exact lighting so legend colours match the map |
+| `pipeline/annotate.py` | Color grade, title, legend, callouts, credits, city labels with collision avoidance |
+| `pipeline/legend_render.py` | Render flat swatch tiles under the map&#x27;s exact lighting so legend colors match the map |
 | `pipeline/fetch_data.sh`, `fetch_tx_senate_2026.py` | Data downloads |
 | `docs/` | GitHub Pages site (`index.html` is generated by `docs/build_site.py` from `docs/template.html`) |
 | `fonts/` | Inter (SIL OFL 1.1), used by `annotate.py` |
@@ -335,7 +335,7 @@ that `prep.py` reads (boundaries, clipping, resolution, election data).
 1. Add an entry to `R` in `pipeline/regions.py`. Copy a similar one:
    - `kontur`: ISO-2 codes of the Kontur files (fetch them with `fetch_data.sh`).
    - `bnd`: `(&#x27;ne0&#x27;, [Natural Earth ADMIN names])` for countries, `(&#x27;ne1&#x27;, &#x27;Province&#x27;)` for provinces
-     (prep.py filters `admin==&#x27;Canada&#x27;`; generalise that filter for other countries), `(&#x27;census&#x27;, &#x27;ST&#x27;)` for US states.
+     (prep.py filters `admin==&#x27;Canada&#x27;`; generalize that filter for other countries), `(&#x27;census&#x27;, &#x27;ST&#x27;)` for US states.
    - `national=True` only when the Kontur file covers exactly that territory (keeps coastal cells with a 3 km buffer).
    - optional `bbox` (drop overseas territories), `lakes=True` (cut Natural Earth lakes from the land slab).
    - `cities`: `(name, lon, lat)` in label priority order; colliding labels are nudged, then dropped.
@@ -348,13 +348,13 @@ that `prep.py` reads (boundaries, clipping, resolution, election data).
 Add `election=dict(...)` to a region (see `texas_senate` and `texas_pres2024`):
 - `level=&#x27;county&#x27;`: a CSV with columns `county,d,r,l,o,tot` plus Census county polygons (`counties`, `statefp`).
 - `level=&#x27;precinct&#x27;`: a GeoJSON of precinct polygons with vote columns (`dcol`, `rcol`, `totcol`) and a sibling CSV.
-Each hexagon takes the result of the unit containing its centre; the land slab is built from the unit polygons,
-each in its own result colour. Colour = (D−R)/(D+R) on `EL_STOPS`/`EL_COLS` in `regions.py`.
+Each hexagon takes the result of the unit containing its center; the land slab is built from the unit polygons,
+each in its own result color. Color = (D−R)/(D+R) on `EL_STOPS`/`EL_COLS` in `regions.py`.
 
 ## Invariants: do not break these
 
-- **Use real data only.** Never invent, interpolate or &quot;fill in&quot; populations or votes. If a source is unreachable, stop and say so.
-- **Heights stay linear** in people per km² (normalised to each map&#x27;s densest cell). Colour carries the log scale.
+- **Use real data only.** Never invent, interpolate, or &quot;fill in&quot; populations or votes. If a source is unreachable, stop and say so.
+- **Heights stay linear** in people per km² (normalized to each map&#x27;s densest cell). Color carries the log scale.
 - **Keep the density ramp in sync.** `stops`/`cols` appear in `render.py` and `legend_render.py`; change both,
   then re-run `legend_render.py` (make_map.sh does this). The election ramp lives once, in `regions.py`.
 - **Legend swatches must be rendered**, not picked: lighting and AgX tone mapping change how albedo looks.
@@ -367,7 +367,7 @@ each in its own result colour. Colour = (D−R)/(D+R) on `EL_STOPS`/`EL_COLS` in
 - A city&#x27;s densest cell is a one-pixel needle; labels anchor on the 25th-tallest cell within ~1.6% of the extent.
 - H3 res-7 cells on icosahedron edges have up to 10 vertices; `prep.py` keeps the 6 sharpest corners.
 - Clip population with the full boundary, but build the land slab from the lake-cut shape (Ontario lost 780k people otherwise).
-- Germany, the UK, India and eastern China are blue nearly everywhere because rural density is in the hundreds per km². That is data.
+- Germany, the UK, India, and eastern China are blue nearly everywhere because rural density is in the hundreds per km². That is data.
 - `annotate.py` sets the white point from the bare ground in each render, so any sun angle grades the same.
 - Plan oblique = render the 50° oblique view with `pixel_aspect_x = 1/cos(50°)`; do not stretch images afterwards.
 
@@ -473,7 +473,7 @@ if &#x27;election&#x27; in c:
     lat_,lon_=np.array([h3.cell_to_latlng(x) for x in cells]).T
     pts=gpd.GeoDataFrame(geometry=gpd.points_from_xy(lon_,lat_),crs=4326)
     j=gpd.sjoin_nearest(pts.to_crs(3083),co[[&#x27;m&#x27;,&#x27;geometry&#x27;]].to_crs(3083),how=&#x27;left&#x27;).groupby(level=0).first()   # nearest handles edge cells
-    # county-coloured slab: triangulate each county (holes/islands kept) and keep its outline rings for walls
+    # county-colored slab: triangulate each county (holes/islands kept) and keep its outline rings for walls
     ct,ctm,cr,crm=[],[],[],[]
     for g_,m_ in zip(co.geometry,co.m):
         gq=shapely.ops.transform(lambda x,y:tr.transform(x,y),g_)
@@ -509,11 +509,11 @@ d=np.load(f&#x27;{WORK}/{key}.npz&#x27;,allow_pickle=True); c=R[key]
 X,Y=d[&#x27;x&#x27;],d[&#x27;y&#x27;]; dens=d[&#x27;pop&#x27;]/d[&#x27;area&#x27;]; n=len(dens)
 x0,y0,x1,y1=d[&#x27;bounds&#x27;]; S=max(x1-x0,y1-y0)          # all dimensions scale from the Texas design (S=1250 km)
 HMAX=0.224*S; h=0.0002*S+dens/dens.max()*HMAX; SLAB=0.0024*S
-# colour: same absolute log-density ramp as Texas, so maps are comparable
+# color: same absolute log-density ramp as Texas, so maps are comparable
 ld=np.log10(np.clip(dens,1,None)); stops=np.array([0.0,1.0,1.8,2.6,3.4,4.15])
 cols=np.array([[215,38,40],[232,84,66],[250,246,240],[244,246,250],[70,135,225],[25,90,215]])/255.
 rgb=np.stack([np.interp(ld,stops,cols[:,k]) for k in range(3)],1)
-if &#x27;margin&#x27; in d.files:   # colour = county two-party margin (D-R)/(D+R): red Republican, blue Democratic
+if &#x27;margin&#x27; in d.files:   # color = county two-party margin (D-R)/(D+R): red Republican, blue Democratic
     from regions import EL_STOPS, EL_COLS
     ec=np.array(EL_COLS)/255.; rgb=np.stack([np.interp(d[&#x27;margin&#x27;],EL_STOPS,ec[:,k]) for k in range(3)],1)
 lin=np.where(rgb&lt;=0.04045,rgb/12.92,((rgb+0.055)/1.055)**2.4)
@@ -540,7 +540,7 @@ def elcol(m):   # election ramp in linear RGB
     from regions import EL_STOPS, EL_COLS
     ec=np.array(EL_COLS)/255.; r=np.stack([np.interp(m,EL_STOPS,ec[:,k]) for k in range(3)],-1)
     return np.where(r&lt;=0.04045,r/12.92,((r+0.055)/1.055)**2.4)
-if &#x27;ctris&#x27; in d.files:   # election maps: slab built from county polygons, each in its county&#x27;s result colour
+if &#x27;ctris&#x27; in d.files:   # election maps: slab built from county polygons, each in its county&#x27;s result color
     T=d[&#x27;ctris&#x27;]; nt=len(T); C=elcol(d[&#x27;ctm&#x27;])
     vt=[np.dstack([T,np.zeros((nt,3,1))]).reshape(-1,3),np.dstack([T,np.full((nt,3,1),-SLAB)]).reshape(-1,3)]
     ft=[(3*i,3*i+1,3*i+2) for i in range(nt)]+[(3*(nt+i)+2,3*(nt+i)+1,3*(nt+i)) for i in range(nt)]; fc=list(C)+list(C)
@@ -639,7 +639,7 @@ if &#x27;election&#x27; in c:
         x=mx+n*(sw+gap); d0.rectangle([x,yb-sh,x+sw,yb],fill=tuple(int(q) for q in col))
     im=grade(raw,WP); dr=ImageDraw.Draw(im)
     dr.text((mx,my),f&quot;{c[&#x27;title&#x27;]} Results&quot;,font=fT,fill=ink)
-    dr.text((mx,my+int(U*0.055)),f&quot;Colour: {E[&#x27;level&#x27;]} two-party margin. Height: people per km² (linear), on 317,903 H3 hexagons.&quot;,font=fS,fill=sub)
+    dr.text((mx,my+int(U*0.055)),f&quot;Color: {E[&#x27;level&#x27;]} two-party margin. Height: people per km² (linear), on 317,903 H3 hexagons.&quot;,font=fS,fill=sub)
     for n,lab in enumerate([&#x27;R+60&#x27;,&#x27;R+30&#x27;,&#x27;Even&#x27;,&#x27;D+30&#x27;,&#x27;D+60&#x27;]):
         x=mx+n*(sw+gap); dr.rectangle([x,yb-sh,x+sw,yb],outline=(175,160,140),width=1)
         w=dr.textlength(lab,font=fL); dr.text((x+sw/2-w/2,yb+int(U*0.006)),lab,font=fL,fill=ink)
@@ -656,7 +656,7 @@ else:
     sw,gap=int(U*0.05),int(U*0.004); step=int(U*0.011); base_h=int(U*0.014)
     yb=my+int(U*0.10)+base_h+4*step                                       # baseline of the stairs
     d0=ImageDraw.Draw(raw)
-    for n,col in enumerate(json.load(open(f&#x27;{WORK}/legend_colors.json&#x27;))):  # swatch colours rendered under the map lighting
+    for n,col in enumerate(json.load(open(f&#x27;{WORK}/legend_colors.json&#x27;))):  # swatch colors rendered under the map lighting
         x=mx+n*(sw+gap); d0.rectangle([x,yb-(base_h+n*step),x+sw,yb],fill=tuple(int(q) for q in col))
     im=grade(raw,WP); dr=ImageDraw.Draw(im)
     dr.text((mx,my),f&quot;{c[&#x27;title&#x27;]} Population Density&quot;,font=fT,fill=ink)
@@ -671,7 +671,7 @@ else:
     lon0,lat0,pcx,pcy=d[&#x27;proj&#x27;]; tr=Transformer.from_crs(4326,f&#x27;+proj=laea +lat_0={lat0} +lon_0={lon0} +units=km&#x27;,always_xy=True)
     mxk,myk=d[&#x27;x&#x27;][i].mean()+pcx,d[&#x27;y&#x27;][i].mean()+pcy
     near=min(c[&#x27;cities&#x27;],key=lambda q:np.hypot(*(np.array(tr.transform(q[1],q[2]))-[mxk,myk])))[0]
-    lines=[(&#x27;Each colour step is 10× denser&#x27;,fLb,ink),
+    lines=[(&#x27;Each color step is 10× denser&#x27;,fLb,ink),
            (&#x27;Darkest blue (10,000+ people/km²) is 10,000× denser than darkest red (≤1).&#x27;,fL,sub),
            (f&#x27;Spike height is linear: the tallest, in {near}, is {dens[i]:,.0f} people/km².&#x27;,fL,sub)]
     y=top-int(U*0.002)
@@ -694,12 +694,12 @@ for name,px,py in meta[&#x27;labels&#x27;]:
     taken.append(b)
     do.rounded_rectangle([x+U*0.0012,y+U*0.0018,x+bw+U*0.0012,y+bh+U*0.0018],radius=bh/2,fill=(40,28,18,55))   # soft drop shadow
     do.rounded_rectangle([x,y,x+bw,y+bh],radius=bh/2,fill=(*cream,232),outline=(150,128,104,200),width=max(1,int(U/1400)))
-    texts.append((x+bw/2-(l_+r_)/2,y+bh/2+capH/2,name))         # baseline so capitals sit centred; ink box centred horizontally
+    texts.append((x+bw/2-(l_+r_)/2,y+bh/2+capH/2,name))         # baseline so capitals sit centered; ink box centered horizontally
 ov=ov.filter(ImageFilter.GaussianBlur(0)) ; im=Image.alpha_composite(im.convert(&#x27;RGBA&#x27;),ov).convert(&#x27;RGB&#x27;); dr=ImageDraw.Draw(im)
 for x,y,name in texts: dr.text((x,y),name,font=fN,fill=ink,anchor=&#x27;ls&#x27;)
 im.save(OUT,optimize=True)
 </pre></div></details>
-  <details><summary>pipeline/legend_render.py<span>render the swatch colours · <a href="https://github.com/stamen/prompted-population-maps/blob/main/pipeline/legend_render.py" target="_blank" rel="noopener">on GitHub</a></span></summary><div class="codebox"><button class="copy" type="button">Copy</button><pre># Render the 5 legend swatches as flat tiles under the identical material, sun, sky and AgX settings as render.py,
+  <details><summary>pipeline/legend_render.py<span>render the swatch colors · <a href="https://github.com/stamen/prompted-population-maps/blob/main/pipeline/legend_render.py" target="_blank" rel="noopener">on GitHub</a></span></summary><div class="codebox"><button class="copy" type="button">Copy</button><pre># Render the 5 legend swatches as flat tiles under the identical material, sun, sky, and AgX settings as render.py,
 # so each swatch shows exactly how a flat hexagon top of that density class appears in the map.
 import bpy, numpy as np, math, sys, json
 from mathutils import Vector
@@ -793,7 +793,7 @@ print(f&quot;254 counties  D {t.d.sum():,.0f}  R {t.r.sum():,.0f}  total {t.tot.
   <div class="stack col">
     <span class="eyebrow">For comparison</span>
     <h2>Three ways to fake the same maps</h2>
-    <p>We gave ChatGPT and Gemini the final Texas map and one sentence, with no other context. Neither was asked to fake anything, and neither had population data. Both returned images that imitate the style: the spikes, colours, legend and shadows are painted, not computed. The third example is this project's own agent, asked to fake the maps on purpose with code.</p>
+    <p>We gave ChatGPT and Gemini the final Texas map and one sentence, with no other context. Neither was asked to fake anything, and neither had population data. Both returned images that imitate the style: the spikes, colors, legend, and shadows are painted, not computed. The third example is this project's own agent, asked to fake the maps on purpose with code.</p>
   </div>
   <div class="prompt">
     <span class="eyebrow">The exact prompt, with the Texas image attached</span>
@@ -804,14 +804,14 @@ print(f&quot;254 counties  D {t.d.sum():,.0f}  R {t.r.sum():,.0f}  total {t.tot.
     <figcaption><b>Response 1: Gemini</b><span>one image, eight panels, Texas redrawn alongside the seven countries</span></figcaption>
   </figure>
   <ul class="tight col">
-    <li>Almost every label is unreadable or invented: the Texas panel's city names are made-up words, Japan gets “Taqjio” beside Tokyo, and Egypt's tallest spike is labelled “Egypt”.</li>
+    <li>Almost every label is unreadable or invented: the Texas panel's city names are made-up words, Japan gets “Taqjio” beside Tokyo, and Egypt's tallest spike is labeled “Egypt”.</li>
     <li>The small text (subtitles, legend callouts, credits) is letter-shaped noise that only resembles the Texas originals.</li>
     <li>Russia is almost entirely flat red with one spike, and Brazil and Australia show internal borders that were never in the source style.</li>
     <li>The overall look (cream ground, red land, blue spikes, long eastward shadows) is copied convincingly.</li>
   </ul>
   <figure class="stack" style="margin:0;gap:12px">
     <a class="plate" href="img/llm/chatgpt.jpg" target="_blank" rel="noopener"><img src="img/llm/chatgpt.jpg" alt="ChatGPT response: seven painted 3D population maps on one sheet with readable labels" width="1536" height="1024" loading="lazy"></a>
-    <figcaption><b>Response 2: ChatGPT</b><span>one sheet, seven countries, readable labels and headline figures</span></figcaption>
+    <figcaption><b>Response 2: ChatGPT</b><span>one sheet, seven countries, readable labels, and headline figures</span></figcaption>
   </figure>
   <ul class="tight col">
     <li>The labels are readable and mostly in the right places, which makes this the more convincing of the two chatbot images at a glance.</li>
@@ -825,16 +825,16 @@ print(f&quot;254 counties  D {t.d.sum():,.0f}  R {t.r.sum():,.0f}  total {t.tot.
   </div>
   <figure class="stack" style="margin:0;gap:12px">
     <a class="plate" href="img/llm/claude-code-vibes.jpg" target="_blank" rel="noopener"><img src="img/llm/claude-code-vibes.jpg" alt="Response 3: seven 3D population maps rendered in Blender from invented data, each marked as not real data" width="2400" height="1568" loading="lazy"></a>
-    <figcaption><b>Response 3: Claude Code, faking it with code</b><span>invented inputs, real renderer, labelled “NOT REAL DATA”</span></figcaption>
+    <figcaption><b>Response 3: Claude Code, faking it with code</b><span>invented inputs, real renderer, labeled “NOT REAL DATA”</span></figcaption>
   </figure>
   <ul class="tight col">
     <li>The inputs are invented, but the rendering is real. Outlines were typed from memory as rough coordinate lists, cities placed from memory with guessed metro sizes, rural density guessed as smooth regional patterns plus noise, and each map scaled to a remembered national total. The pipeline's own renderer then extruded and ray-traced it.</li>
-    <li>Because the text is set in code, every title, legend and label is correct and readable, and every image says it is fabricated. That is the danger of this route: it looks exactly as authoritative as the real maps.</li>
-    <li>The tells are in the geography and the texture. Egypt is a trapezoid with the Sinai misplaced, Baja California is a wedge and Japan's islands are blobs. The countryside is a smooth gradient instead of roads, rivers and towns, and cities are symmetric needles.</li>
+    <li>Because the text is set in code, every title, legend, and label is correct and readable, and every image says it is fabricated. That is the danger of this route: it looks exactly as authoritative as the real maps.</li>
+    <li>The tells are in the geography and the texture. Egypt is a trapezoid with the Sinai misplaced, Baja California is a wedge, and Japan's islands are blobs. The countryside is a smooth gradient instead of roads, rivers, and towns, and cities are symmetric needles.</li>
     <li>Errors in the guesses do not announce themselves: Japan came out blue almost everywhere because the guessed rural density was too high.</li>
     <li>Measured cost: about 30k output tokens (about $2.30) for all seven, plus about a minute of rendering each. That was cheap only because the real pipeline already existed; once it does, a real map costs about 2k tokens, less than a fake one.</li>
   </ul>
-  <p class="col muted small">Together they show why faking stays tempting: the look is the easy part to imitate, and the errors only show up when you check the geography, the numbers and the text against a real source.</p>
+  <p class="col muted small">Together they show why faking stays tempting: the look is the easy part to imitate, and the errors only show up when you check the geography, the numbers, and the text against a real source.</p>
 </section>
 </div>
 <script>

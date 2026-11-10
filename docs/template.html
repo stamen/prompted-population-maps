@@ -115,7 +115,7 @@ details[open] summary{border-bottom:1px solid var(--rule)}
   <div class="stack col">
     <span class="eyebrow">Population density</span>
     <h2>Eight maps, one pipeline</h2>
-    <p class="muted">Click a map for the full 3600-pixel image. Heights are linear and normalised to each map's densest cell, so compare colours across maps, not heights.</p>
+    <p class="muted">Click a map for the full 3600-pixel image. Heights are linear and normalized to each map's densest cell, so compare colors across maps, not heights.</p>
   </div>
   <div class="gallery">
 <!--GALLERY-->
@@ -126,7 +126,7 @@ details[open] summary{border-bottom:1px solid var(--rule)}
   <div class="stack col">
     <span class="eyebrow">Votes on population</span>
     <h2>Election results draped on the same spikes</h2>
-    <p class="muted">The height is still people per km². The colour is the two-party margin of the county or precinct each hexagon falls in, from R+60 (dark red) to D+60 (dark blue), so the tall spikes show where the votes were cast.</p>
+    <p class="muted">The height is still people per km². The color is the two-party margin of the county or precinct each hexagon falls in, from R+60 (dark red) to D+60 (dark blue), so the tall spikes show where the votes were cast.</p>
   </div>
   <div class="gallery">
 <!--ELECTION-->
@@ -149,7 +149,7 @@ details[open] summary{border-bottom:1px solid var(--rule)}
   <div class="stack col">
     <span class="eyebrow">Pick up where we left off</span>
     <h2>Make your own map</h2>
-    <p>Clone the repo and either hand it to your own coding agent, or run the commands yourself. <code>AGENTS.md</code> tells any LLM (Claude, Codex, Gemini, Cursor and others) how the pipeline works, what not to break, and how to check its work.</p>
+    <p>Clone the repo and either hand it to your own coding agent, or run the commands yourself. <code>AGENTS.md</code> tells any LLM (Claude, Codex, Gemini, Cursor, and others) how the pipeline works, what not to break, and how to check its work.</p>
   </div>
   <div class="prompt">
     <span class="eyebrow">A prompt for your agent</span>
@@ -184,11 +184,11 @@ python docs/build_site.py              # refresh this site</pre>
       <tr><th>To change</th><th>File</th><th>Look for</th></tr>
       <tr><td>A region, its cities, its data</td><td>pipeline/regions.py</td><td>one entry in <code>R</code></td></tr>
       <tr><td>Sun height and direction</td><td>pipeline/regions.py</td><td><code>SUN_EL</code>, <code>SUN_AZ</code>. Lower elevation means longer shadows</td></tr>
-      <tr><td>Density colour ramp</td><td>pipeline/render.py, pipeline/legend_render.py</td><td><code>stops</code>, <code>cols</code>. Change both, then re-run legend_render.py</td></tr>
-      <tr><td>Election colour ramp</td><td>pipeline/regions.py</td><td><code>EL_STOPS</code>, <code>EL_COLS</code></td></tr>
+      <tr><td>Density color ramp</td><td>pipeline/render.py, pipeline/legend_render.py</td><td><code>stops</code>, <code>cols</code>. Change both, then re-run legend_render.py</td></tr>
+      <tr><td>Election color ramp</td><td>pipeline/regions.py</td><td><code>EL_STOPS</code>, <code>EL_COLS</code></td></tr>
       <tr><td>Height exaggeration</td><td>pipeline/render.py</td><td><code>HMAX=0.224*S</code> (S = region extent in km)</td></tr>
       <tr><td>View tilt</td><td>pipeline/render.py, pipeline/legend_render.py</td><td><code>tilt</code>; <code>pixel_aspect_x = 1/cos(tilt)</code> gives the plan-oblique view</td></tr>
-      <tr><td>Ground and uninhabited land colour</td><td>pipeline/render.py</td><td><code>mat('ground', …)</code>, <code>slabm</code></td></tr>
+      <tr><td>Ground and uninhabited land color</td><td>pipeline/render.py</td><td><code>mat('ground', …)</code>, <code>slabm</code></td></tr>
       <tr><td>Brightness, contrast, saturation</td><td>pipeline/annotate.py</td><td><code>grade()</code>; the white point is measured from the bare ground</td></tr>
       <tr><td>Title, legend, callouts, labels</td><td>pipeline/annotate.py</td><td>text blocks; label pills and collision list <code>taken</code></td></tr>
       <tr><td>Margins and framing</td><td>pipeline/render.py</td><td><code>fx0, fx1, fy0, fy1</code>. Extra room on the east is for shadows</td></tr>
@@ -205,8 +205,8 @@ python docs/build_site.py              # refresh this site</pre>
     <div class="card"><h3>The densest cell is a needle</h3><p>A city's densest hexagon is one pixel wide and towers over the visible skyline. Labels anchor on the 25th-tallest cell nearby instead, which is where the eye sees the city.</p></div>
     <div class="card b"><h3>H3 cells are not always hexagons</h3><p>Resolution-7 cells that straddle an icosahedron face edge carry up to 10 boundary vertices. <code>prep.py</code> keeps the six sharpest corners; pentagons are padded to six.</p></div>
     <div class="card"><h3>Lakes need two polygons</h3><p>Clip the population with the full provincial boundary and build the land from the lake-cut shape. Clipping data with 1:10m lake shorelines dropped 780,000 Ontario lakeshore residents.</p></div>
-    <div class="card b"><h3>Legend colours must be rendered</h3><p>Lighting and tone mapping change how each colour looks. The swatches are flat tiles rendered under the identical sun and sky, then put through the same grade as the map.</p></div>
-    <div class="card"><h3>Dense countries look different</h3><p>Germany, the UK and India are blue almost everywhere because rural density is in the hundreds per km². England's 99th-percentile cell is a quarter of its maximum, so its field is uniformly tall. That is the data.</p></div>
+    <div class="card b"><h3>Legend colors must be rendered</h3><p>Lighting and tone mapping change how each color looks. The swatches are flat tiles rendered under the identical sun and sky, then put through the same grade as the map.</p></div>
+    <div class="card"><h3>Dense countries look different</h3><p>Germany, the UK, and India are blue almost everywhere because rural density is in the hundreds per km². England's 99th-percentile cell is a quarter of its maximum, so its field is uniformly tall. That is the data.</p></div>
     <div class="card b"><h3>Check totals, and check sources</h3><p><code>prep.py</code> prints the population it kept: Texas 29.95M, Germany 83.5M, India 1.43B, China 1.43B all match official figures. Election totals were checked against certified or independently reported numbers.</p></div>
   </div>
 </section>
@@ -245,7 +245,7 @@ python docs/build_site.py              # refresh this site</pre>
   <div class="stack col">
     <span class="eyebrow">For comparison</span>
     <h2>Three ways to fake the same maps</h2>
-    <p>We gave ChatGPT and Gemini the final Texas map and one sentence, with no other context. Neither was asked to fake anything, and neither had population data. Both returned images that imitate the style: the spikes, colours, legend and shadows are painted, not computed. The third example is this project's own agent, asked to fake the maps on purpose with code.</p>
+    <p>We gave ChatGPT and Gemini the final Texas map and one sentence, with no other context. Neither was asked to fake anything, and neither had population data. Both returned images that imitate the style: the spikes, colors, legend, and shadows are painted, not computed. The third example is this project's own agent, asked to fake the maps on purpose with code.</p>
   </div>
   <div class="prompt">
     <span class="eyebrow">The exact prompt, with the Texas image attached</span>
@@ -256,14 +256,14 @@ python docs/build_site.py              # refresh this site</pre>
     <figcaption><b>Response 1: Gemini</b><span>one image, eight panels, Texas redrawn alongside the seven countries</span></figcaption>
   </figure>
   <ul class="tight col">
-    <li>Almost every label is unreadable or invented: the Texas panel's city names are made-up words, Japan gets “Taqjio” beside Tokyo, and Egypt's tallest spike is labelled “Egypt”.</li>
+    <li>Almost every label is unreadable or invented: the Texas panel's city names are made-up words, Japan gets “Taqjio” beside Tokyo, and Egypt's tallest spike is labeled “Egypt”.</li>
     <li>The small text (subtitles, legend callouts, credits) is letter-shaped noise that only resembles the Texas originals.</li>
     <li>Russia is almost entirely flat red with one spike, and Brazil and Australia show internal borders that were never in the source style.</li>
     <li>The overall look (cream ground, red land, blue spikes, long eastward shadows) is copied convincingly.</li>
   </ul>
   <figure class="stack" style="margin:0;gap:12px">
     <a class="plate" href="img/llm/chatgpt.jpg" target="_blank" rel="noopener"><img src="img/llm/chatgpt.jpg" alt="ChatGPT response: seven painted 3D population maps on one sheet with readable labels" width="1536" height="1024" loading="lazy"></a>
-    <figcaption><b>Response 2: ChatGPT</b><span>one sheet, seven countries, readable labels and headline figures</span></figcaption>
+    <figcaption><b>Response 2: ChatGPT</b><span>one sheet, seven countries, readable labels, and headline figures</span></figcaption>
   </figure>
   <ul class="tight col">
     <li>The labels are readable and mostly in the right places, which makes this the more convincing of the two chatbot images at a glance.</li>
@@ -277,16 +277,16 @@ python docs/build_site.py              # refresh this site</pre>
   </div>
   <figure class="stack" style="margin:0;gap:12px">
     <a class="plate" href="img/llm/claude-code-vibes.jpg" target="_blank" rel="noopener"><img src="img/llm/claude-code-vibes.jpg" alt="Response 3: seven 3D population maps rendered in Blender from invented data, each marked as not real data" width="2400" height="1568" loading="lazy"></a>
-    <figcaption><b>Response 3: Claude Code, faking it with code</b><span>invented inputs, real renderer, labelled “NOT REAL DATA”</span></figcaption>
+    <figcaption><b>Response 3: Claude Code, faking it with code</b><span>invented inputs, real renderer, labeled “NOT REAL DATA”</span></figcaption>
   </figure>
   <ul class="tight col">
     <li>The inputs are invented, but the rendering is real. Outlines were typed from memory as rough coordinate lists, cities placed from memory with guessed metro sizes, rural density guessed as smooth regional patterns plus noise, and each map scaled to a remembered national total. The pipeline's own renderer then extruded and ray-traced it.</li>
-    <li>Because the text is set in code, every title, legend and label is correct and readable, and every image says it is fabricated. That is the danger of this route: it looks exactly as authoritative as the real maps.</li>
-    <li>The tells are in the geography and the texture. Egypt is a trapezoid with the Sinai misplaced, Baja California is a wedge and Japan's islands are blobs. The countryside is a smooth gradient instead of roads, rivers and towns, and cities are symmetric needles.</li>
+    <li>Because the text is set in code, every title, legend, and label is correct and readable, and every image says it is fabricated. That is the danger of this route: it looks exactly as authoritative as the real maps.</li>
+    <li>The tells are in the geography and the texture. Egypt is a trapezoid with the Sinai misplaced, Baja California is a wedge, and Japan's islands are blobs. The countryside is a smooth gradient instead of roads, rivers, and towns, and cities are symmetric needles.</li>
     <li>Errors in the guesses do not announce themselves: Japan came out blue almost everywhere because the guessed rural density was too high.</li>
     <li>Measured cost: about 30k output tokens (about $2.30) for all seven, plus about a minute of rendering each. That was cheap only because the real pipeline already existed; once it does, a real map costs about 2k tokens, less than a fake one.</li>
   </ul>
-  <p class="col muted small">Together they show why faking stays tempting: the look is the easy part to imitate, and the errors only show up when you check the geography, the numbers and the text against a real source.</p>
+  <p class="col muted small">Together they show why faking stays tempting: the look is the easy part to imitate, and the errors only show up when you check the geography, the numbers, and the text against a real source.</p>
 </section>
 </div>
 <script>

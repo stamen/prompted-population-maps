@@ -13,7 +13,7 @@
    "share": "~22.5k"
   },
   {
-   "phase": "Texas: brighter colours, taller, warm ground, labels",
+   "phase": "Texas: brighter colors, taller, warm ground, labels",
    "share": "~19k"
   },
   {
@@ -34,7 +34,7 @@
    "sum": true
   },
   {
-   "phase": "Generalise the pipeline to any region",
+   "phase": "Generalize the pipeline to any region",
    "share": "~13k"
   },
   {
@@ -58,7 +58,7 @@
    "share": "~22k"
   },
   {
-   "phase": "County-coloured land",
+   "phase": "County-colored land",
    "share": "~6k"
   },
   {
@@ -66,15 +66,15 @@
    "share": "~18k"
   },
   {
-   "phase": "Sun at 15°, centred labels",
+   "phase": "Sun at 15°, centered labels",
    "share": "~9k"
   },
   {
-   "phase": "Repo, agent guide and Pages site",
+   "phase": "Repo, agent guide, and Pages site",
    "share": "~30k"
   },
   {
-   "phase": "Each additional region, once generalised",
+   "phase": "Each additional region, once generalized",
    "share": "~2k",
    "sum": true
   }

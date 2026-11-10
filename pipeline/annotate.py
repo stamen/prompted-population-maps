@@ -34,7 +34,7 @@ if 'election' in c:
         x=mx+n*(sw+gap); d0.rectangle([x,yb-sh,x+sw,yb],fill=tuple(int(q) for q in col))
     im=grade(raw,WP); dr=ImageDraw.Draw(im)
     dr.text((mx,my),f"{c['title']} Results",font=fT,fill=ink)
-    dr.text((mx,my+int(U*0.055)),f"Colour: {E['level']} two-party margin. Height: people per km² (linear), on 317,903 H3 hexagons.",font=fS,fill=sub)
+    dr.text((mx,my+int(U*0.055)),f"Color: {E['level']} two-party margin. Height: people per km² (linear), on 317,903 H3 hexagons.",font=fS,fill=sub)
     for n,lab in enumerate(['R+60','R+30','Even','D+30','D+60']):
         x=mx+n*(sw+gap); dr.rectangle([x,yb-sh,x+sw,yb],outline=(175,160,140),width=1)
         w=dr.textlength(lab,font=fL); dr.text((x+sw/2-w/2,yb+int(U*0.006)),lab,font=fL,fill=ink)
@@ -51,7 +51,7 @@ else:
     sw,gap=int(U*0.05),int(U*0.004); step=int(U*0.011); base_h=int(U*0.014)
     yb=my+int(U*0.10)+base_h+4*step                                       # baseline of the stairs
     d0=ImageDraw.Draw(raw)
-    for n,col in enumerate(json.load(open(f'{WORK}/legend_colors.json'))):  # swatch colours rendered under the map lighting
+    for n,col in enumerate(json.load(open(f'{WORK}/legend_colors.json'))):  # swatch colors rendered under the map lighting
         x=mx+n*(sw+gap); d0.rectangle([x,yb-(base_h+n*step),x+sw,yb],fill=tuple(int(q) for q in col))
     im=grade(raw,WP); dr=ImageDraw.Draw(im)
     dr.text((mx,my),f"{c['title']} Population Density",font=fT,fill=ink)
@@ -66,7 +66,7 @@ else:
     lon0,lat0,pcx,pcy=d['proj']; tr=Transformer.from_crs(4326,f'+proj=laea +lat_0={lat0} +lon_0={lon0} +units=km',always_xy=True)
     mxk,myk=d['x'][i].mean()+pcx,d['y'][i].mean()+pcy
     near=min(c['cities'],key=lambda q:np.hypot(*(np.array(tr.transform(q[1],q[2]))-[mxk,myk])))[0]
-    lines=[('Each colour step is 10× denser',fLb,ink),
+    lines=[('Each color step is 10× denser',fLb,ink),
            ('Darkest blue (10,000+ people/km²) is 10,000× denser than darkest red (≤1).',fL,sub),
            (f'Spike height is linear: the tallest, in {near}, is {dens[i]:,.0f} people/km².',fL,sub)]
     y=top-int(U*0.002)
@@ -89,7 +89,7 @@ for name,px,py in meta['labels']:
     taken.append(b)
     do.rounded_rectangle([x+U*0.0012,y+U*0.0018,x+bw+U*0.0012,y+bh+U*0.0018],radius=bh/2,fill=(40,28,18,55))   # soft drop shadow
     do.rounded_rectangle([x,y,x+bw,y+bh],radius=bh/2,fill=(*cream,232),outline=(150,128,104,200),width=max(1,int(U/1400)))
-    texts.append((x+bw/2-(l_+r_)/2,y+bh/2+capH/2,name))         # baseline so capitals sit centred; ink box centred horizontally
+    texts.append((x+bw/2-(l_+r_)/2,y+bh/2+capH/2,name))         # baseline so capitals sit centered; ink box centered horizontally
 ov=ov.filter(ImageFilter.GaussianBlur(0)) ; im=Image.alpha_composite(im.convert('RGBA'),ov).convert('RGB'); dr=ImageDraw.Draw(im)
 for x,y,name in texts: dr.text((x,y),name,font=fN,fill=ink,anchor='ls')
 im.save(OUT,optimize=True)

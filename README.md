@@ -3,7 +3,7 @@
 Path-traced 3D population maps. Every inhabited [H3](https://h3geo.org) hexagon from
 [Kontur Population](https://www.kontur.io/portfolio/population-dataset/) is extruded to a height that is linear in
 people per km², then rendered in Blender Cycles under a low sun, so every shadow is ray-traced from the real geometry.
-The same spikes can be coloured by density or by election results.
+The same spikes can be colored by density or by election results.
 
 **Site:** https://stamen.github.io/prompted-population-maps/ (gallery, the step-by-step history, and the code)
 
@@ -45,7 +45,7 @@ Give your agent something like:
 > the population total against the official figure before rendering the final.
 
 `AGENTS.md` covers the commands, the repo map, how to add regions and election data, the invariants (real data
-only, linear heights, rendered legends, ray-traced shadows, source credits) and the pitfalls that were already solved.
+only, linear heights, rendered legends, ray-traced shadows, source credits), and the pitfalls that were already solved.
 `CLAUDE.md` imports it for Claude Code.
 
 ## How it works
@@ -57,15 +57,15 @@ only, linear heights, rendered legends, ray-traced shadows, source credits) and 
    view rendered with wide pixels (`1/cos 50°`), a *plan oblique* projection that keeps the true top-down footprint
    while heights rise. Cycles path-traces at 64 samples with denoising.
 3. **`legend_render.py`** renders the legend swatches as flat tiles under the same lighting, so they match the map.
-4. **`annotate.py`** applies a colour grade (white point measured from the bare ground), then the title,
-   stepped legend, callouts, credits and city labels.
+4. **`annotate.py`** applies a color grade (white point measured from the bare ground), then the title,
+   stepped legend, callouts, credits, and city labels.
 
-## Data and licences
+## Data and licenses
 
-| Source | Used for | Licence |
+| Source | Used for | License |
 |---|---|---|
 | [Kontur Population 2023-11-01](https://data.humdata.org/organization/kontur) | population per H3 cell | CC BY 4.0 |
-| [Natural Earth 1:10m](https://www.naturalearthdata.com) | country, province and lake boundaries | public domain |
+| [Natural Earth 1:10m](https://www.naturalearthdata.com) | country, province, and lake boundaries | public domain |
 | [US Census cartographic boundaries 2023](https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html) | US states and counties | public domain |
 | [Wikipedia: 2026 U.S. Senate election in Texas](https://en.wikipedia.org/wiki/2026_United_States_Senate_election_in_Texas) | unofficial county returns | CC BY-SA 4.0 |
 | [NYT 2024 presidential precinct map](https://github.com/nytimes/presidential-precinct-map-2024) | Texas precinct results and boundaries | NYT non-commercial; credit required |
@@ -84,5 +84,5 @@ general, each new region cost about 2k new tokens and 6–15 minutes of renderin
 
 `docs/` is served by GitHub Pages (Settings → Pages → Deploy from branch → `main` / `/docs`).
 After rendering finals into `out/`, run `python docs/build_site.py`: it exports web and full-size JPEGs, fills
-`docs/template.html` with the gallery, history (`docs/history.json`), cost log (`docs/cost_log.json`) and the
+`docs/template.html` with the gallery, history (`docs/history.json`), cost log (`docs/cost_log.json`), and the
 current pipeline source, and writes `docs/index.html`.
