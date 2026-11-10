@@ -14,12 +14,12 @@ repo. [`AGENTS.md`](AGENTS.md) is written so that you can hand the repo to your 
 
 ## Maps
 
-| Density | | Elections on population | |
-|---|---|---|---|
-| Texas | New York State | Texas 2026 U.S. Senate (county) | Texas 2024 presidential (precinct) |
-| Ontario | United Kingdom | | |
-| France | Germany | | |
-| India | China | | |
+<table>
+<tr><td align="center"><a href="docs/full/texas.jpg"><img src="docs/img/texas.jpg" width="240" alt="Texas"></a><br>Texas</td><td align="center"><a href="docs/full/new_york.jpg"><img src="docs/img/new_york.jpg" width="240" alt="New York State"></a><br>New York State</td><td align="center"><a href="docs/full/ontario.jpg"><img src="docs/img/ontario.jpg" width="240" alt="Ontario"></a><br>Ontario</td></tr>
+<tr><td align="center"><a href="docs/full/uk.jpg"><img src="docs/img/uk.jpg" width="240" alt="United Kingdom"></a><br>United Kingdom</td><td align="center"><a href="docs/full/france.jpg"><img src="docs/img/france.jpg" width="240" alt="France"></a><br>France</td><td align="center"><a href="docs/full/germany.jpg"><img src="docs/img/germany.jpg" width="240" alt="Germany"></a><br>Germany</td></tr>
+<tr><td align="center"><a href="docs/full/india.jpg"><img src="docs/img/india.jpg" width="240" alt="India"></a><br>India</td><td align="center"><a href="docs/full/china.jpg"><img src="docs/img/china.jpg" width="240" alt="China"></a><br>China</td><td align="center"><a href="docs/full/texas_senate.jpg"><img src="docs/img/texas_senate.jpg" width="240" alt="Texas 2026 Senate (county)"></a><br>Texas 2026 Senate (county)</td></tr>
+<tr><td align="center"><a href="docs/full/texas_pres2024.jpg"><img src="docs/img/texas_pres2024.jpg" width="240" alt="Texas 2024 presidential (precinct)"></a><br>Texas 2024 presidential (precinct)</td></tr>
+</table>
 
 Full-resolution JPEGs are in [`docs/full/`](docs/full).
 

@@ -119,6 +119,20 @@ details[open] summary{border-bottom:1px solid var(--rule)}
   <div class="gallery">
     <figure><a class="plate" href="full/texas.jpg" target="_blank" rel="noopener"><img src="img/texas.jpg" alt="Texas, raytraced 3D hexagon map" width="1600" height="1777" loading="lazy"></a>
       <figcaption><b>Texas</b><span class="num">30.0 million · 317,903 cells · res 8 (~0.83 km²)</span></figcaption></figure>
+    <figure><a class="plate" href="full/new_york.jpg" target="_blank" rel="noopener"><img src="img/new_york.jpg" alt="New York State, raytraced 3D hexagon map" width="1600" height="1521" loading="lazy"></a>
+      <figcaption><b>New York State</b><span class="num">19.4 million · 119,773 cells · res 8 (~0.77 km²)</span></figcaption></figure>
+    <figure><a class="plate" href="full/ontario.jpg" target="_blank" rel="noopener"><img src="img/ontario.jpg" alt="Ontario, raytraced 3D hexagon map" width="1600" height="1974" loading="lazy"></a>
+      <figcaption><b>Ontario</b><span class="num">14.6 million · 126,617 cells · res 8 (~0.79 km²)</span></figcaption></figure>
+    <figure><a class="plate" href="full/uk.jpg" target="_blank" rel="noopener"><img src="img/uk.jpg" alt="United Kingdom, raytraced 3D hexagon map" width="1600" height="2227" loading="lazy"></a>
+      <figcaption><b>United Kingdom</b><span class="num">67.7 million · 224,223 cells · res 8 (~0.66 km²)</span></figcaption></figure>
+    <figure><a class="plate" href="full/france.jpg" target="_blank" rel="noopener"><img src="img/france.jpg" alt="France, raytraced 3D hexagon map" width="1600" height="1736" loading="lazy"></a>
+      <figcaption><b>France</b><span class="num">64.9 million · 595,906 cells · res 8 (~0.69 km²)</span></figcaption></figure>
+    <figure><a class="plate" href="full/germany.jpg" target="_blank" rel="noopener"><img src="img/germany.jpg" alt="Germany, raytraced 3D hexagon map" width="1600" height="2387" loading="lazy"></a>
+      <figcaption><b>Germany</b><span class="num">83.5 million · 363,457 cells · res 8 (~0.66 km²)</span></figcaption></figure>
+    <figure><a class="plate" href="full/india.jpg" target="_blank" rel="noopener"><img src="img/india.jpg" alt="India, raytraced 3D hexagon map" width="1600" height="1972" loading="lazy"></a>
+      <figcaption><b>India</b><span class="num">1.43 billion · 475,320 cells · res 7 (~5.24 km²)</span></figcaption></figure>
+    <figure><a class="plate" href="full/china.jpg" target="_blank" rel="noopener"><img src="img/china.jpg" alt="China, raytraced 3D hexagon map" width="1600" height="1693" loading="lazy"></a>
+      <figcaption><b>China</b><span class="num">1.43 billion · 821,724 cells · res 7 (~4.34 km²)</span></figcaption></figure>
 
   </div>
 </section>
@@ -132,6 +146,8 @@ details[open] summary{border-bottom:1px solid var(--rule)}
   <div class="gallery">
     <figure><a class="plate" href="full/texas_senate.jpg" target="_blank" rel="noopener"><img src="img/texas_senate.jpg" alt="Texas 2026 U.S. Senate Results, raytraced 3D hexagon map" width="1600" height="1777" loading="lazy"></a>
       <figcaption><b>Texas 2026 U.S. Senate Results</b><span class="num">county results · 317,903 cells</span></figcaption></figure>
+    <figure><a class="plate" href="full/texas_pres2024.jpg" target="_blank" rel="noopener"><img src="img/texas_pres2024.jpg" alt="Texas 2024 Presidential Results, raytraced 3D hexagon map" width="1600" height="1777" loading="lazy"></a>
+      <figcaption><b>Texas 2024 Presidential Results</b><span class="num">precinct results · 317,903 cells</span></figcaption></figure>
 
   </div>
   <p class="col muted small">2026 Senate: unofficial county returns compiled on Wikipedia (retrieved 10 Nov 2026), spot-checked against Decision Desk HQ and the Dallas Morning News; statewide precinct results were not yet published. 2024 presidential: The New York Times precinct results with official boundaries, used under the NYT non-commercial data agreement.</p>
@@ -247,12 +263,12 @@ python docs/build_site.py              # refresh this site</pre>
   <div class="grid2">
     <div class="stack" style="gap:10px">
       <h3>Measured, whole session</h3>
-      <div class="tbl"><table><tr><th>Metric</th><th class="r">Value</th></tr><tr><td>Output tokens (written by the model, including reasoning)</td><td class="r">156,834</td></tr><tr><td>Input tokens, not cached</td><td class="r">45,339</td></tr><tr><td>Cache writes</td><td class="r">462,704</td></tr><tr><td>Cache reads (the conversation re-read on every step)</td><td class="r">32,839,978</td></tr><tr><td>API cost at list price</td><td class="r">$13.41</td></tr></table></div>
-      <p class="muted small">As of 2026-11-10 17:14 UTC, before the repo setup. Cache reads dominate: every tool call re-reads the conversation so far.</p>
+      <div class="tbl"><table><tr><th>Metric</th><th class="r">Value</th></tr><tr><td>Output tokens (written by the model, including reasoning)</td><td class="r">218,110</td></tr><tr><td>Input tokens, not cached</td><td class="r">46,944</td></tr><tr><td>Cache writes</td><td class="r">541,526</td></tr><tr><td>Cache reads (the conversation re-read on every step)</td><td class="r">49,045,711</td></tr><tr><td>API cost at list price</td><td class="r">$18.51</td></tr></table></div>
+      <p class="muted small">As of 2026-11-10 17:52 UTC (repo setup included). Cache reads dominate: every tool call re-reads the conversation so far.</p>
     </div>
     <div class="stack" style="gap:10px">
       <h3>Estimated by phase</h3>
-      <div class="tbl"><table><tr><th>Phase</th><th class="r">New tokens</th></tr><tr><td>Texas: first request, setup, first render</td><td class="r">~22.5k</td></tr><tr><td>Texas: brighter colours, taller, warm ground, labels</td><td class="r">~19k</td></tr><tr><td>Texas: uninhabited land red</td><td class="r">~2.5k</td></tr><tr><td>Texas: names only, taller, five swatches</td><td class="r">~8k</td></tr><tr><td>Texas: plan oblique, title, grade, rendered legend</td><td class="r">~20k</td></tr><tr class=sum><td>Texas subtotal</td><td class="r">~72k</td></tr><tr><td>Generalise the pipeline to any region</td><td class="r">~13k</td></tr><tr><td>Seven regions: config, previews, fixes</td><td class="r">~11.5k</td></tr><tr><td>Ontario lakes</td><td class="r">~4.5k</td></tr><tr><td>Portable scripts and first shared page</td><td class="r">~19k</td></tr><tr><td>Readable labels and stepped legend</td><td class="r">~5k</td></tr><tr><td>2026 Senate results by county</td><td class="r">~22k</td></tr><tr><td>County-coloured land</td><td class="r">~6k</td></tr><tr><td>Precinct search and 2024 precinct map</td><td class="r">~18k</td></tr><tr><td>Sun at 15°, centred labels</td><td class="r">~9k</td></tr><tr class=sum><td>Each additional region, once generalised</td><td class="r">~2k</td></tr></table></div>
+      <div class="tbl"><table><tr><th>Phase</th><th class="r">New tokens</th></tr><tr><td>Texas: first request, setup, first render</td><td class="r">~22.5k</td></tr><tr><td>Texas: brighter colours, taller, warm ground, labels</td><td class="r">~19k</td></tr><tr><td>Texas: uninhabited land red</td><td class="r">~2.5k</td></tr><tr><td>Texas: names only, taller, five swatches</td><td class="r">~8k</td></tr><tr><td>Texas: plan oblique, title, grade, rendered legend</td><td class="r">~20k</td></tr><tr class=sum><td>Texas subtotal</td><td class="r">~72k</td></tr><tr><td>Generalise the pipeline to any region</td><td class="r">~13k</td></tr><tr><td>Seven regions: config, previews, fixes</td><td class="r">~11.5k</td></tr><tr><td>Ontario lakes</td><td class="r">~4.5k</td></tr><tr><td>Portable scripts and first shared page</td><td class="r">~19k</td></tr><tr><td>Readable labels and stepped legend</td><td class="r">~5k</td></tr><tr><td>2026 Senate results by county</td><td class="r">~22k</td></tr><tr><td>County-coloured land</td><td class="r">~6k</td></tr><tr><td>Precinct search and 2024 precinct map</td><td class="r">~18k</td></tr><tr><td>Sun at 15°, centred labels</td><td class="r">~9k</td></tr><tr><td>Repo, agent guide and Pages site</td><td class="r">~30k</td></tr><tr class=sum><td>Each additional region, once generalised</td><td class="r">~2k</td></tr></table></div>
     </div>
   </div>
   <p class="col muted small">The first map took about a third of the session. Once the pipeline was general, a new region cost about 2k new tokens (one config entry plus reviewing one preview) and 6–15 minutes of rendering.</p>
