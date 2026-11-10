@@ -81,6 +81,8 @@ details[open] summary{border-bottom:1px solid var(--rule)}
 .card{border-top:3px solid var(--red);padding-top:12px;display:flex;flex-direction:column;gap:6px}
 .card.b{border-top-color:var(--blue)}
 .card p{font-size:.93rem}
+.intro{margin:0;border-left:3px solid var(--red);padding:4px 0 4px 24px;display:flex;flex-direction:column;gap:16px;max-width:68ch;font-style:italic;font-size:1.05rem}
+.intro cite{font-style:normal;font:500 .8rem var(--f-mono);letter-spacing:.06em;color:var(--muted)}
 .prompt{border:1px solid var(--rule);border-radius:4px;background:var(--plate);padding:16px;display:flex;flex-direction:column;gap:10px;position:relative}
 .prompt pre{white-space:pre-wrap}
 @media (max-width:820px){.hero,.step,.grid2{grid-template-columns:minmax(0,1fr)}.step .plate{max-width:420px}}
@@ -110,6 +112,18 @@ details[open] summary{border-bottom:1px solid var(--rule)}
   </div>
   <a class="plate" href="full/texas.jpg" target="_blank" rel="noopener"><img src="img/texas.jpg" alt="Texas population density, raytraced 3D hexagon map"></a>
 </header>
+
+<section class="stack" style="gap:20px">
+  <div class="stack col">
+    <span class="eyebrow">In the author's words</span>
+    <h2>Introduction</h2>
+  </div>
+  <blockquote class="intro">
+    <p>Several years ago I wrote a blog post called “<a href="https://stamen.com/shadows-on-maps-are-getting-a-lot-more-exciting-and-heres-why/">Shadows on maps are getting a lot more exciting, and here’s why</a>,” exploring this style of cartography, which I called “Blender maps.” These maps are strikingly beautiful, showing long dramatic shadows cast by exaggerated terrain or, in this case, extruded virtual mountains of data. They are also very tedious to make, requiring many complex steps to prep your data and fine-tune the settings in Blender (a process made somewhat easier by the excellent tutorials by <a href="https://somethingaboutmaps.wordpress.com/">Daniel Huffman</a>).</p>
+    <p>For the #30DayMapChallenge Day 10 topic, “Prompting only,” I wanted to see if I could get Claude to automate some of the process of creating maps like these. I was also motivated to try this particular topic because I’ve recently seen some AI-generated maps in this style that clearly were not using real data. This style of map has become so trendy and ubiquitous that LLMs can make superficially convincing “maps” in this style that don’t actually show real data. In this experiment I wanted to show that AI-generated maps don’t have to be fake, but that we should still think about which parts of the cartographic process should or shouldn’t be automated. I’ll have more thoughts about that later, but for now, I’ll let Claude share what we made:</p>
+    <cite>— Alan McConchie</cite>
+  </blockquote>
+</section>
 
 <section class="stack" style="gap:28px">
   <div class="stack col">
