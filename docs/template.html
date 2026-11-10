@@ -243,8 +243,8 @@ python docs/build_site.py              # refresh this site</pre>
 <section class="stack" style="gap:28px">
   <div class="stack col">
     <span class="eyebrow">For comparison</span>
-    <h2>What image chatbots make from the same Texas map</h2>
-    <p>We gave ChatGPT and Gemini the final Texas map and one sentence, with no other context. Neither was asked to fake anything, and neither had population data. Both returned images that imitate the style: the spikes, colours, legend and shadows are painted, not computed.</p>
+    <h2>Three ways to fake the same maps</h2>
+    <p>We gave ChatGPT and Gemini the final Texas map and one sentence, with no other context. Neither was asked to fake anything, and neither had population data. Both returned images that imitate the style: the spikes, colours, legend and shadows are painted, not computed. The third example is this project's own agent, asked to fake the maps on purpose with code.</p>
   </div>
   <div class="prompt">
     <span class="eyebrow">The exact prompt, with the Texas image attached</span>
@@ -265,12 +265,27 @@ python docs/build_site.py              # refresh this site</pre>
     <figcaption><b>Response 2</b><span>one sheet, seven countries, readable labels and headline figures</span></figcaption>
   </figure>
   <ul class="tight col">
-    <li>The labels are readable and mostly in the right places, which makes this the more convincing of the two at a glance.</li>
+    <li>The labels are readable and mostly in the right places, which makes this the more convincing of the two chatbot images at a glance.</li>
     <li>Each map carries a precise population and area, but nothing on the map was computed from them. The callout still says the tallest spike “is 13,394 people/km²”, which is Houston's value, copied from the Texas image.</li>
     <li>The per-map legends repeat a swatch (“1,000” twice, and one reads “1:00”), and Egypt is drawn as a rectangle.</li>
     <li>Density is painted where it feels right rather than where people live: Russia's far east, around Vladivostok, is as blue as Moscow.</li>
   </ul>
-  <p class="col muted small">Each took a single prompt. Together they show why faking stays tempting: the look is the easy part to imitate, and the errors only show up when you check the geography, the numbers and the text against a real source.</p>
+  <div class="prompt">
+    <span class="eyebrow">Response 3 was asked for differently, in the same session that built this pipeline</span>
+    <pre>Given this final style that we have settled on, can you make similar maps for some other countries (like, the USA, Russia, Japan, Mexico, Brazil, Australia, Egypt) but without using data. Just do it with vibes.</pre>
+  </div>
+  <figure class="stack" style="margin:0;gap:12px">
+    <a class="plate" href="img/llm/response3.jpg" target="_blank" rel="noopener"><img src="img/llm/response3.jpg" alt="Response 3: seven 3D population maps rendered in Blender from invented data, each marked as not real data" width="2400" height="1568" loading="lazy"></a>
+    <figcaption><b>Response 3: Claude Code, faking it with code</b><span>invented inputs, real renderer, labelled “NOT REAL DATA”</span></figcaption>
+  </figure>
+  <ul class="tight col">
+    <li>The inputs are invented, but the rendering is real. Outlines were typed from memory as rough coordinate lists, cities placed from memory with guessed metro sizes, rural density guessed as smooth regional patterns plus noise, and each map scaled to a remembered national total. The pipeline's own renderer then extruded and ray-traced it.</li>
+    <li>Because the text is set in code, every title, legend and label is correct and readable, and every image says it is fabricated. That is the danger of this route: it looks exactly as authoritative as the real maps.</li>
+    <li>The tells are in the geography and the texture. Egypt is a trapezoid with the Sinai misplaced, Baja California is a wedge and Japan's islands are blobs. The countryside is a smooth gradient instead of roads, rivers and towns, and cities are symmetric needles.</li>
+    <li>Errors in the guesses do not announce themselves: Japan came out blue almost everywhere because the guessed rural density was too high.</li>
+    <li>Measured cost: about 30k output tokens (about $2.30) for all seven, plus about a minute of rendering each. That was cheap only because the real pipeline already existed; once it does, a real map costs about 2k tokens, less than a fake one.</li>
+  </ul>
+  <p class="col muted small">Together they show why faking stays tempting: the look is the easy part to imitate, and the errors only show up when you check the geography, the numbers and the text against a real source.</p>
 </section>
 </div>
 <script>
