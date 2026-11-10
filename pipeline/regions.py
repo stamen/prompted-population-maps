@@ -10,6 +10,7 @@ NE0=f'{DATA}/bnd/ne_10m_admin_0_countries.geojson'; NE1=f'{DATA}/bnd/ne_10m_admi
 LAKES=f'{DATA}/bnd/ne_10m_lakes.geojson'
 CENSUS=f'zip://{DATA}/bnd/cb_2023_us_state_5m.zip'
 K=f'{DATA}/kontur/'
+SITE_URL='stamen.github.io/prompted-population-maps'   # printed in every map's credits
 SUN_EL=15.0; SUN_AZ=282.0     # sun elevation above the horizon and azimuth (degrees); lower = longer shadows
 # election ramp on two-party margin (D-R)/(D+R): -0.6 = R+60 ... +0.6 = D+60
 EL_STOPS=[-0.6,-0.3,-0.1,0.0,0.1,0.3,0.6]

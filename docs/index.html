@@ -388,6 +388,7 @@ NE0=f&#x27;{DATA}/bnd/ne_10m_admin_0_countries.geojson&#x27;; NE1=f&#x27;{DATA}/
 LAKES=f&#x27;{DATA}/bnd/ne_10m_lakes.geojson&#x27;
 CENSUS=f&#x27;zip://{DATA}/bnd/cb_2023_us_state_5m.zip&#x27;
 K=f&#x27;{DATA}/kontur/&#x27;
+SITE_URL=&#x27;stamen.github.io/prompted-population-maps&#x27;   # printed in every map&#x27;s credits
 SUN_EL=15.0; SUN_AZ=282.0     # sun elevation above the horizon and azimuth (degrees); lower = longer shadows
 # election ramp on two-party margin (D-R)/(D+R): -0.6 = R+60 ... +0.6 = D+60
 EL_STOPS=[-0.6,-0.3,-0.1,0.0,0.1,0.3,0.6]
@@ -605,7 +606,7 @@ t=time.time(); bpy.ops.render.render(write_still=True); print(f&#x27;{key} {WPX}
   <details><summary>pipeline/annotate.py<span>grade, title, legend, labels · <a href="https://github.com/stamen/prompted-population-maps/blob/main/pipeline/annotate.py" target="_blank" rel="noopener">on GitHub</a></span></summary><div class="codebox"><button class="copy" type="button">Copy</button><pre># usage: annotate.py &lt;region&gt; &lt;raw.png&gt; &lt;out.png&gt;
 import numpy as np, sys, json, os
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
-sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); from regions import R, WORK, SUN_EL, FONTS
+sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); from regions import R, WORK, SUN_EL, FONTS, SITE_URL
 from pyproj import Transformer
 key,RAW,OUT=sys.argv[1:4]; c=R[key]; meta=json.load(open(RAW.rsplit(&#x27;.&#x27;,1)[0]+&#x27;_meta.json&#x27;))
 def ground_level(im):
@@ -677,9 +678,10 @@ else:
     for t,f,col in lines: dr.text((lx2,y),t,font=f,fill=col); y+=int(f.size*1.45)
     legend_bottom=max(y,yb+int(U*0.03))
 cr=(f&quot;Results: {c[&#x27;election&#x27;][&#x27;source&#x27;]}\n&quot; if &#x27;election&#x27; in c else &quot;&quot;)+f&quot;Data: Kontur Population (2023-11-01, CC BY 4.0) · {meta[&#x27;pop&#x27;]/1e6:,.1f} million people\nBoundary: {c[&#x27;credit&#x27;]} · Plan oblique view, {meta.get(&#x27;projection&#x27;,&#x27;Lambert azimuthal equal-area&#x27;)}\nRendered in Blender 5.2 Cycles (path-traced). Sun at {SUN_EL:g}° elevation from the west; all shadows are ray-traced from the geometry.&quot;
-dr.multiline_text((mx,H-my-int(U*(0.073 if &#x27;election&#x27; in c else 0.055))),cr,font=fC,fill=sub,spacing=int(U*0.004))
+cr+=f&quot;\nMaps and code: {SITE_URL}&quot;
+dr.multiline_text((mx,H-my-int(U*(0.091 if &#x27;election&#x27; in c else 0.073))),cr,font=fC,fill=sub,spacing=int(U*0.004))
 # ---- city labels: bold name on a soft cream pill sitting just above each city&#x27;s skyline
-taken=[(0,0,W,legend_bottom+int(U*0.01)),(0,H-my-int(U*0.09),W,H)]
+taken=[(0,0,W,legend_bottom+int(U*0.01)),(0,H-my-int(U*0.11),W,H)]
 def hit(b): return any(not(b[2]&lt;t[0] or b[0]&gt;t[2] or b[3]&lt;t[1] or b[1]&gt;t[3]) for t in taken)
 ov=Image.new(&#x27;RGBA&#x27;,im.size,(0,0,0,0)); do=ImageDraw.Draw(ov); texts=[]
 capH=fN.getbbox(&#x27;H&#x27;)[3]-fN.getbbox(&#x27;H&#x27;)[1]; padx,pady=fN.size*0.55,fN.size*0.42

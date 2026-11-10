@@ -1,7 +1,7 @@
 # usage: annotate.py <region> <raw.png> <out.png>
 import numpy as np, sys, json, os
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
-sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); from regions import R, WORK, SUN_EL, FONTS
+sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); from regions import R, WORK, SUN_EL, FONTS, SITE_URL
 from pyproj import Transformer
 key,RAW,OUT=sys.argv[1:4]; c=R[key]; meta=json.load(open(RAW.rsplit('.',1)[0]+'_meta.json'))
 def ground_level(im):
@@ -73,9 +73,10 @@ else:
     for t,f,col in lines: dr.text((lx2,y),t,font=f,fill=col); y+=int(f.size*1.45)
     legend_bottom=max(y,yb+int(U*0.03))
 cr=(f"Results: {c['election']['source']}\n" if 'election' in c else "")+f"Data: Kontur Population (2023-11-01, CC BY 4.0) · {meta['pop']/1e6:,.1f} million people\nBoundary: {c['credit']} · Plan oblique view, {meta.get('projection','Lambert azimuthal equal-area')}\nRendered in Blender 5.2 Cycles (path-traced). Sun at {SUN_EL:g}° elevation from the west; all shadows are ray-traced from the geometry."
-dr.multiline_text((mx,H-my-int(U*(0.073 if 'election' in c else 0.055))),cr,font=fC,fill=sub,spacing=int(U*0.004))
+cr+=f"\nMaps and code: {SITE_URL}"
+dr.multiline_text((mx,H-my-int(U*(0.091 if 'election' in c else 0.073))),cr,font=fC,fill=sub,spacing=int(U*0.004))
 # ---- city labels: bold name on a soft cream pill sitting just above each city's skyline
-taken=[(0,0,W,legend_bottom+int(U*0.01)),(0,H-my-int(U*0.09),W,H)]
+taken=[(0,0,W,legend_bottom+int(U*0.01)),(0,H-my-int(U*0.11),W,H)]
 def hit(b): return any(not(b[2]<t[0] or b[0]>t[2] or b[3]<t[1] or b[1]>t[3]) for t in taken)
 ov=Image.new('RGBA',im.size,(0,0,0,0)); do=ImageDraw.Draw(ov); texts=[]
 capH=fN.getbbox('H')[3]-fN.getbbox('H')[1]; padx,pady=fN.size*0.55,fN.size*0.42
