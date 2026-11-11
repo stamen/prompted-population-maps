@@ -1,11 +1,11 @@
 {
  "measured": {
-  "as_of": "2026-11-10 17:52 UTC (repo setup included)",
-  "output_tokens": 218110,
-  "input_tokens": 46944,
-  "cache_write_tokens": 541526,
-  "cache_read_tokens": 49045711,
-  "cost_usd": 18.51
+  "as_of": "2026-11-11 01:58 UTC (whole session)",
+  "output_tokens": 295743,
+  "input_tokens": 52773,
+  "cache_write_tokens": 1531745,
+  "cache_read_tokens": 112707657,
+  "cost_usd": 40.75
  },
  "phases": [
   {
@@ -72,6 +72,26 @@
   {
    "phase": "Repo, agent guide, and Pages site",
    "share": "~30k"
+  },
+  {
+   "phase": "Seven vibes maps (no data, same renderer)",
+   "share": "~35k"
+  },
+  {
+   "phase": "Chatbot comparison section",
+   "share": "~8k"
+  },
+  {
+   "phase": "Real data for the seven vibes countries",
+   "share": "~15k"
+  },
+  {
+   "phase": "US Great Lakes cut out",
+   "share": "~3k"
+  },
+  {
+   "phase": "Author’s notes and page edits",
+   "share": "~15k"
   },
   {
    "phase": "Each additional region, once generalized",

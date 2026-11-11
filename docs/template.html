@@ -280,7 +280,18 @@ python docs/build_site.py              # refresh this site</pre>
       <div class="tbl"><table><tr><th>Phase</th><th class="r">New tokens</th></tr><!--COST--></table></div>
     </div>
   </div>
-  <p class="col muted small">The first map took about a third of the session. Once the pipeline was general, a new region cost about 2k new tokens (one config entry plus reviewing one preview) and 6–15 minutes of rendering.</p>
+  <div class="stack col" style="gap:10px">
+    <h3>In dollars</h3>
+    <p>At list API prices, the whole session cost about <strong>$41</strong>. Usage readings taken along the way split it roughly like this:</p>
+    <ul class="tight">
+      <li><strong>$13.41</strong> for everything up to the repository: the first Texas map and its revisions, the seven other density maps, and both election maps.</li>
+      <li><strong>About $3</strong> to turn that work into this repository, its agent guide, and this site.</li>
+      <li><strong>About $2</strong> for the seven vibes maps, measured between two readings.</li>
+      <li><strong>About $22</strong> for everything after that: the real versions of the seven vibes countries, the comparison section, the author’s notes, and page edits. The seven real countries were a few dollars of that (an estimate; they could not be separated from the other work).</li>
+    </ul>
+    <p class="muted small">Later steps cost more than early ones even when they did less, because each step re-reads the whole conversation, which by then was over half a million tokens. The same seven countries made in a fresh session from this repository would cost a small fraction as much, which is the point of writing everything down. The renders themselves ran for roughly four and a half hours of 4-core CPU time in total.</p>
+  </div>
+  <p class="col muted small">The first map took about a quarter of the new tokens. Once the pipeline was general, a new region cost about 2k new tokens (one config entry plus reviewing one preview) and 4–15 minutes of rendering, against about 5k per country for the vibes versions.</p>
 </section>
 
 <section class="stack" style="gap:20px">

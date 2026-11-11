@@ -80,8 +80,9 @@ The 2026 Senate figures were unofficial at the time of rendering; swap in the ce
 ## What it cost
 
 See the *What it took* section of the site for measured session totals (tokens and API cost) and an estimated
-split by phase. The short version: the first Texas map took about a third of the session; once the pipeline was
-general, each new region cost about 2k new tokens and 6–15 minutes of rendering.
+split by phase. The short version: the whole session cost about $41 at list API prices, and the first Texas map took
+about a quarter of its new tokens. Once the pipeline was general, each new region cost about 2k new tokens and 4–15
+minutes of rendering; the seven "vibes" maps made without data cost about $2, roughly 5k new tokens per country.
 
 ## Rebuilding the site
 
