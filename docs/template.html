@@ -122,7 +122,7 @@ details[open] summary{border-bottom:1px solid var(--rule)}
   <blockquote class="intro">
     <p>Several years ago I wrote a blog post called “<a href="https://stamen.com/shadows-on-maps-are-getting-a-lot-more-exciting-and-heres-why/">Shadows on maps are getting a lot more exciting, and here’s why</a>,” exploring this style of cartography, which I called “Blender maps.” These maps are strikingly beautiful, showing long dramatic shadows cast by exaggerated terrain or, in this case, extruded virtual mountains of data. They are also very tedious to make, requiring many complex steps to prep your data and fine-tune the settings in Blender (a process made somewhat easier by the excellent tutorials by <a href="https://somethingaboutmaps.wordpress.com/">Daniel Huffman</a>).</p>
     <p>For the #30DayMapChallenge Day 10 topic, “Prompting only,” I wanted to see if I could get Claude to automate some of the process of creating maps like these. I was also motivated to try this particular topic because I’ve recently seen some AI-generated maps in this style that clearly were not using real data. This style of map has become so trendy and ubiquitous that LLMs can make superficially convincing “maps” in this style that don’t actually show real data. In this experiment I wanted to show that AI-generated maps don’t have to be fake, but that we should still think about which parts of the cartographic process should or shouldn’t be automated. I’ll have more thoughts about that later, but for now, I’ll let Claude share what we made:</p>
-    <cite>— Alan McConchie</cite>
+    <cite>— Alan</cite>
   </blockquote>
 </section>
 
@@ -146,7 +146,7 @@ details[open] summary{border-bottom:1px solid var(--rule)}
     <p>Why these specific maps? I chose these states and countries just to reproduce the <a href="https://www.threads.com/share/BAcMhPxj1t">AI-generated fake-data versions I saw online</a>. But you could create your own by following the instructions further down in this post.</p>
     <p>And why these colors? The original post I saw was a map of Texas using this color scheme, so I decided to stick with it. I wouldn’t have picked this red-white-and-blue scheme myself, but possibly it was meant to evoke the Texas flag or the US flag. But since the map was also posted shortly after the 2026 midterm elections, it’s also probably meant to add to the “land doesn’t vote” narrative, showing how “blue” Democratic votes are concentrated in cities and “red” Republican votes tend to be in low-density rural areas. To be honest, using this color scheme on a map like this around the election makes me a bit uncomfortable: it feels like we’re trying to make an election map but without using real data. Will people incorrectly interpret these previous maps as election results?</p>
     <p>So, I was curious if we <em>could</em> color these with election results instead? Here is one using county-level results from the 2026 Senate election (precinct-level results are not available yet) and another with the 2024 presidential results to see what finer-grained precinct-level results will look like. The maps are certainly more complex and messy, but that’s what the real world is like:</p>
-    <cite>— Alan McConchie</cite>
+    <cite>— Alan</cite>
   </blockquote>
 </section>
 
@@ -170,7 +170,7 @@ details[open] summary{border-bottom:1px solid var(--rule)}
   <blockquote class="intro">
     <p>I also wanted to be fully transparent about the process I used to make these maps. These were done via “prompting only,” per today’s #30DayMapChallenge rule. I told Claude what I wanted, gave it some specific direction about what data to include and what tools to use, and then spent several prompts iterating on the results.</p>
     <p>In terms of creative control, there are certainly some decisions that Claude made that I didn’t bother to reconsider, but my goal was to use the AI for the tedious, uncreative work and keep most creative decisions for myself. As you can see in the prompts below, the initial result was really not ready for prime time. Claude needed a lot of human input to get the results into something more usable and visually pleasing.</p>
-    <cite>— Alan McConchie</cite>
+    <cite>— Alan</cite>
   </blockquote>
 </section>
 
@@ -259,7 +259,7 @@ python docs/build_site.py              # refresh this site</pre>
   <blockquote class="intro">
     <p>I was also curious how much effort each part of the process took, so I asked Claude to estimate the token usage for each step, and for what it took to generate the additional maps once we had the workflow set up. I’m no expert in interpreting the token usage, and these aren’t a good metric of the real-world economic and environmental impact of LLM usage. But I am curious how these compare relative to the still-significant electricity usage of running an hours-long Blender render if I’d done all the setup myself. I was also curious about using these numbers to compare with the costs of “faking” these maps without real data (more on that below). Why do people ask LLMs to make fake versions of these maps, and why do they seem content with them? Is it just that the fakes are easier and quicker to make than asking the LLM to do the real work?</p>
     <p>One of the other concerns with LLMs is that they often have to figure things out from first principles again and again, which wastes water and electricity. Using the scripts and documentation in this repo (provided above), I hope that other users can get up and running with this semi-automated pipeline themselves (with or without AI help) without having to repeat so many steps from scratch.</p>
-    <cite>— Alan McConchie</cite>
+    <cite>— Alan</cite>
   </blockquote>
 </section>
 
