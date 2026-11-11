@@ -83,9 +83,9 @@ ov=Image.new('RGBA',im.size,(0,0,0,0)); do=ImageDraw.Draw(ov); texts=[]
 capH=fN.getbbox('H')[3]-fN.getbbox('H')[1]; padx,pady=fN.size*0.55,fN.size*0.42
 for name,px,py in meta['labels']:
     l_,t_,r_,b_=fN.getbbox(name,anchor='ls'); w=r_-l_; bw,bh=w+2*padx,capH+2*pady
-    # Nudges never move a label off its spike: straight up first, then sideways by less than half the pill's
+    # Nudges never move a label off its spike: straight up (one or two steps) first, then sideways by less than half the pill's
     # width (so the pill still covers its anchor), then both. If nothing fits, the label is dropped, not misplaced.
-    for dx,dy in [(0,0),(0,-1.1),(0.3,0),(-0.3,0),(0.3,-1.1),(-0.3,-1.1),(0,-2.2)]:
+    for dx,dy in [(0,0),(0,-1.1),(0,-2.2),(0.3,0),(-0.3,0),(0.3,-1.1),(-0.3,-1.1)]:
         x=px-bw/2+dx*bw; y=py-U*0.010-bh+dy*bh; b=(x-3,y-3,x+bw+3,y+bh+3)
         if not hit(b): break
     else:
