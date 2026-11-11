@@ -302,6 +302,24 @@ python docs/build_site.py              # refresh this site</pre>
   </ul>
   <p class="col muted small">Together they show why faking stays tempting: the look is the easy part to imitate, and the errors only show up when you check the geography, the numbers, and the text against a real source.</p>
 </section>
+
+<section class="stack" style="gap:28px">
+  <div class="stack col">
+    <span class="eyebrow">Back to real data</span>
+    <h2>The same seven countries, for real</h2>
+    <p>The same pipeline, run on the same seven countries with real data: Kontur population, Natural Earth boundaries, and nothing typed from memory. Each one needed a single config entry and a preview, then 4–15 minutes of rendering.</p>
+  </div>
+  <div class="gallery">
+<!--REAL7-->
+  </div>
+  <ul class="tight col">
+    <li>Japan is mostly red and white with blue coastal plains, not blue everywhere: the mountainous interior is nearly empty, which the guessed rural density missed.</li>
+    <li>Russia's population follows a narrow band along the south of Siberia and the Trans-Siberian corridor, instead of a smooth fade from west to east.</li>
+    <li>Egypt's people really are confined to the Nile valley and delta, which the vibes version got roughly right, but the real valley is far narrower and the delta far denser.</li>
+    <li>The contiguous United States, Brazil, and Australia show the texture no guess can supply: highways, rivers, irrigated valleys, and small towns.</li>
+  </ul>
+  <p class="col muted small">Totals match official figures within about 2%, except Brazil and Egypt, where Kontur's totals (216 and 113 million) follow UN 2023 estimates rather than national counts (Brazil's 2022 census found 203 million; Egypt's statistics agency reported about 105 million in 2023). The contiguous US map omits Alaska, Hawaii, and the territories, and the Russia map omits the part of Chukotka east of 180°.</p>
+</section>
 </div>
 <script>
 document.querySelectorAll('.copy').forEach(function(b){

@@ -9,6 +9,7 @@ from regions import R, WORK, OUT
 REPO='https://github.com/stamen/prompted-population-maps/blob/main/'
 DENSITY=['texas','new_york','ontario','uk','france','germany','india','china']
 ELECTION=['texas_senate','texas_pres2024']
+REAL7=['usa','russia','japan','mexico','brazil','australia','egypt']   # the seven first made with vibes
 def export(k):
     src=os.path.join(OUT,f'{k}.png')
     if not os.path.exists(src): print('missing',src); return None
@@ -26,6 +27,7 @@ def fig(k,i,extra=''):
             f'      <figcaption><b>{html.escape(name)}</b><span class="num">{extra or ps+f" · {i["cells"]:,} cells · res {i["res"]} (~{i["km2"]:.2f} km²)"}</span></figcaption></figure>\n')
 t=open(f'{D}/template.html').read()
 g=''.join(fig(k,i) for k in DENSITY if (i:=export(k)))
+r7=''.join(fig(k,i) for k in REAL7 if (i:=export(k)))
 e=''.join(fig(k,i,extra=('county results' if R[k]['election']['level']=='county' else 'precinct results')+f" · {i['cells']:,} cells") for k in ELECTION if (i:=export(k)))
 tl=''
 for s in json.load(open(f'{D}/history.json')):
@@ -40,5 +42,5 @@ code=''
 for f,dsc in [('AGENTS.md','instructions for coding agents'),('pipeline/regions.py','one entry per map'),('pipeline/prep.py','clip, aggregate, project, join elections'),('pipeline/render.py','build scene and path-trace'),('pipeline/annotate.py','grade, title, legend, labels'),('pipeline/legend_render.py','render the swatch colors'),('pipeline/make_map.sh','one command per map'),('pipeline/fetch_data.sh','download inputs'),('pipeline/fetch_tx_senate_2026.py','2026 Senate county results')]:
     src=html.escape(open(os.path.join(ROOT,f)).read())
     code+=f'  <details><summary>{f}<span>{dsc} · <a href="{REPO}{f}" target="_blank" rel="noopener">on GitHub</a></span></summary><div class="codebox"><button class="copy" type="button">Copy</button><pre>{src}</pre></div></details>\n'
-for a,b in [('<!--GALLERY-->',g),('<!--ELECTION-->',e),('<!--TIMELINE-->',tl),('<!--COST-->',rows),('<!--MEASURED-->',meas),('<!--MEASURED_AT-->',html.escape(m['as_of'])),('<!--CODE-->',code)]: t=t.replace(a,b)
+for a,b in [('<!--GALLERY-->',g),('<!--ELECTION-->',e),('<!--REAL7-->',r7),('<!--TIMELINE-->',tl),('<!--COST-->',rows),('<!--MEASURED-->',meas),('<!--MEASURED_AT-->',html.escape(m['as_of'])),('<!--CODE-->',code)]: t=t.replace(a,b)
 open(f'{D}/index.html','w').write(t); print('wrote docs/index.html',len(t),'bytes')

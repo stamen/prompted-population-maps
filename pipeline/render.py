@@ -76,7 +76,7 @@ so.rotation_euler=Vector((math.sin(az)*math.cos(el),math.cos(az)*math.cos(el),ma
 w=bpy.data.worlds.new('w'); s.world=w; w.use_nodes=True
 w.node_tree.nodes['Background'].inputs['Color'].default_value=(0.55,0.65,0.85,1); w.node_tree.nodes['Background'].inputs['Strength'].default_value=0.35
 # ---- plan-oblique frame: margins for shadows (east), title (top) and credits (bottom)
-fx0,fx1,fy0,fy1=x0-0.03*S,x1+0.13*S,y0-0.12*S,y1+0.22*S
+fx0,fx1,fy0,fy1=x0-0.03*S,x1+0.13*S,y0-0.12*S,y1+c.get('top',0.22)*S   # 'top': extra headroom when tall spikes sit on the northern edge
 FW,FH=fx1-fx0,fy1-fy0; HPX=int(round(WPX*FH/FW))
 if HPX>int(WPX*1.4): WPX=int(round(WPX*1.4*FW/FH)); HPX=int(round(WPX*FH/FW))   # cap very tall frames
 tilt=math.radians(50); D=4*S
