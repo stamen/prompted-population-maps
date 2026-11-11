@@ -22,6 +22,7 @@ repo. [`AGENTS.md`](AGENTS.md) is written so that you can hand the repo to your 
 <tr><td align="center"><a href="docs/full/usa.jpg"><img src="docs/img/usa.jpg" width="240" alt="United States (contiguous)"></a><br>United States (contiguous)</td><td align="center"><a href="docs/full/russia.jpg"><img src="docs/img/russia.jpg" width="240" alt="Russia"></a><br>Russia</td><td align="center"><a href="docs/full/japan.jpg"><img src="docs/img/japan.jpg" width="240" alt="Japan"></a><br>Japan</td></tr>
 <tr><td align="center"><a href="docs/full/mexico.jpg"><img src="docs/img/mexico.jpg" width="240" alt="Mexico"></a><br>Mexico</td><td align="center"><a href="docs/full/brazil.jpg"><img src="docs/img/brazil.jpg" width="240" alt="Brazil"></a><br>Brazil</td><td align="center"><a href="docs/full/australia.jpg"><img src="docs/img/australia.jpg" width="240" alt="Australia"></a><br>Australia</td></tr>
 <tr><td align="center"><a href="docs/full/egypt.jpg"><img src="docs/img/egypt.jpg" width="240" alt="Egypt"></a><br>Egypt</td></tr>
+<tr><td align="center" colspan="3"><a href="docs/full/usa_full.jpg"><img src="docs/img/usa_full.jpg" width="720" alt="United States, all states and territories at one scale"></a><br>United States, all states and territories at one scale</td></tr>
 </table>
 
 Full-resolution JPEGs are in [`docs/full/`](docs/full).

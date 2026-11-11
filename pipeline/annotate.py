@@ -64,8 +64,9 @@ else:
     # callout: what the stairs mean, and what the spike heights mean
     d=np.load(f'{WORK}/{key}.npz',allow_pickle=True); dens=d['pop']/d['area']; i=int(np.argmax(dens))
     lon0,lat0,pcx,pcy=d['proj']; tr=Transformer.from_crs(4326,f'+proj=laea +lat_0={lat0} +lon_0={lon0} +units=km',always_xy=True)
-    mxk,myk=d['x'][i].mean()+pcx,d['y'][i].mean()+pcy
-    near=min(c['cities'],key=lambda q:np.hypot(*(np.array(tr.transform(q[1],q[2]))-[mxk,myk])))[0]
+    mxk,myk=d['x'][i].mean(),d['y'][i].mean()
+    cxy=[tuple(q) for q in d['city_xy']] if 'city_xy' in d.files else [(n_,*(np.array(tr.transform(lo,la))-[pcx,pcy])) for n_,lo,la in c['cities']]
+    near=min(cxy,key=lambda q:np.hypot(q[1]-mxk,q[2]-myk))[0]
     lines=[('Each color step is 10× denser',fLb,ink),
            ('Darkest blue (10,000+ people/km²) is 10,000× denser than darkest red (≤1).',fL,sub),
            (f'Spike height is linear: the tallest, in {near}, is {dens[i]:,.0f} people/km².',fL,sub)]
@@ -90,6 +91,8 @@ for name,px,py in meta['labels']:
     do.rounded_rectangle([x+U*0.0012,y+U*0.0018,x+bw+U*0.0012,y+bh+U*0.0018],radius=bh/2,fill=(40,28,18,55))   # soft drop shadow
     do.rounded_rectangle([x,y,x+bw,y+bh],radius=bh/2,fill=(*cream,232),outline=(150,128,104,200),width=max(1,int(U/1400)))
     texts.append((x+bw/2-(l_+r_)/2,y+bh/2+capH/2,name))         # baseline so capitals sit centered; ink box centered horizontally
+for name,px,py in meta.get('parts',[]):   # composite maps: small caption under each moved part
+    w=dr.textlength(name,font=fL); dr.text((px-w/2,py+U*0.008),name,font=fL,fill=sub)
 ov=ov.filter(ImageFilter.GaussianBlur(0)) ; im=Image.alpha_composite(im.convert('RGBA'),ov).convert('RGB'); dr=ImageDraw.Draw(im)
 for x,y,name in texts: dr.text((x,y),name,font=fN,fill=ink,anchor='ls')
 im.save(OUT,optimize=True)

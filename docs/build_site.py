@@ -28,6 +28,7 @@ def fig(k,i,extra=''):
 t=open(f'{D}/template.html').read()
 g=''.join(fig(k,i) for k in DENSITY if (i:=export(k)))
 r7f=[fig(k,i) for k in REAL7 if (i:=export(k))]; r7=''.join(r7f) if len(r7f)==len(REAL7) else ''
+uf=fig('usa_full',i) if (i:=export('usa_full')) else ''
 e=''.join(fig(k,i,extra=('county results' if R[k]['election']['level']=='county' else 'precinct results')+f" · {i['cells']:,} cells") for k in ELECTION if (i:=export(k)))
 tl=''
 for s in json.load(open(f'{D}/history.json')):
@@ -44,5 +45,5 @@ for f,dsc in [('AGENTS.md','instructions for coding agents'),('pipeline/regions.
     code+=f'  <details><summary>{f}<span>{dsc} · <a href="{REPO}{f}" target="_blank" rel="noopener">on GitHub</a></span></summary><div class="codebox"><button class="copy" type="button">Copy</button><pre>{src}</pre></div></details>\n'
 if not r7:   # hide the closing section until all of its maps are rendered
     import re; t=re.sub(r'<!--REAL7_START-->[\s\S]*?<!--REAL7_END-->','',t)
-for a,b in [('<!--GALLERY-->',g),('<!--ELECTION-->',e),('<!--REAL7-->',r7),('<!--TIMELINE-->',tl),('<!--COST-->',rows),('<!--MEASURED-->',meas),('<!--MEASURED_AT-->',html.escape(m['as_of'])),('<!--CODE-->',code)]: t=t.replace(a,b)
+for a,b in [('<!--GALLERY-->',g),('<!--ELECTION-->',e),('<!--REAL7-->',r7),('<!--USAFULL-->','  <div class="gallery" style="columns:1">\n'+uf+'  </div>' if uf else ''),('<!--TIMELINE-->',tl),('<!--COST-->',rows),('<!--MEASURED-->',meas),('<!--MEASURED_AT-->',html.escape(m['as_of'])),('<!--CODE-->',code)]: t=t.replace(a,b)
 open(f'{D}/index.html','w').write(t); print('wrote docs/index.html',len(t),'bytes')

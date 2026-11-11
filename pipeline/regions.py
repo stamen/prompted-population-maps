@@ -56,4 +56,23 @@ R={
    cities=[('Sydney',151.21,-33.87),('Melbourne',144.96,-37.81),('Brisbane',153.03,-27.47),('Perth',115.86,-31.95),('Adelaide',138.6,-34.93),('Canberra',149.13,-35.28),('Hobart',147.33,-42.88),('Darwin',130.84,-12.46),('Townsville',146.82,-19.26),('Cairns',145.77,-16.92),('Alice Springs',133.88,-23.7),('Newcastle',151.78,-32.93)]),
  'egypt':dict(title='Egypt',kontur=['EG'],bnd=('ne0',['Egypt']),national=True,top=0.55,credit='Natural Earth 1:10m (de facto boundaries)',
    cities=[('Cairo',31.24,30.04),('Alexandria',29.92,31.2),('Port Said',32.3,31.26),('Suez',32.55,29.97),('Mansoura',31.38,31.04),('Tanta',31.0,30.79),('Asyut',31.18,27.18),('Luxor',32.64,25.69),('Aswan',32.9,24.09),('Hurghada',33.81,27.26),('Siwa',25.52,29.2),('Marsa Matruh',27.24,31.35)]),
+ # ---- the whole United States at one scale: each part keeps its own true size and shape, moved closer (prep_composite.py).
+ #      Kontur's US file already includes PR, VI, GU, MP, and AS; adding their own files would double-count them.
+ 'usa_full':dict(title='United States',kontur=['US'],national=True,res=6,lakes=True,bnd=None,
+   credit='Natural Earth 1:10m (lakes removed). Alaska, Hawaii, and the territories are moved closer but drawn at the same scale',
+   cities=[],
+   parts=[
+    dict(name='Contiguous US',ne=['United States of America'],bbox=[(-125,24,-66.5,49.5)],
+         cities=[('New York',-74.0,40.7),('Los Angeles',-118.24,34.05),('Chicago',-87.63,41.88),('Houston',-95.37,29.76),('Dallas',-96.8,32.78),('Miami',-80.19,25.77),('Atlanta',-84.39,33.75),('Seattle',-122.33,47.61),('Denver',-104.99,39.74),('Phoenix',-112.07,33.45),('San Francisco',-122.42,37.77),('Minneapolis',-93.27,44.98)]),
+    dict(name='Alaska',ne=['United States of America'],bbox=[(-180,51,-129,72),(172,51,180,54)],west_of_180=True,
+         place=dict(ref='Contiguous US',x='left_of',y='align_top',dy=500),cities=[('Anchorage',-149.9,61.22),('Fairbanks',-147.72,64.84),('Juneau',-134.42,58.3)]),
+    dict(name='Hawaii',ne=['United States of America'],bbox=[(-161,18.5,-154.5,22.5)],
+         place=dict(ref='Alaska',x='align_right',y='below'),cities=[('Honolulu',-157.86,21.31)]),
+    dict(name='Guam and Northern Mariana Islands',ne=['Guam','Northern Mariana Islands'],bbox=[(144,13,146.5,21)],
+         place=dict(ref='Hawaii',x='left_of',y='align_top'),cities=[('Hagåtña',144.75,13.47)]),
+    dict(name='American Samoa',ne=['American Samoa'],bbox=[(-171.2,-14.6,-168,-11)],
+         place=dict(ref='Hawaii',x='align_right',y='below'),cities=[('Pago Pago',-170.70,-14.28)]),
+    dict(name='Puerto Rico and US Virgin Islands',ne=['Puerto Rico','United States Virgin Islands'],bbox=[(-68,17.5,-64.5,18.6)],
+         place=dict(ref='Contiguous US',x='align_right',y='below',dx=-700),cities=[('San Juan',-66.1,18.47)]),
+   ]),
 }

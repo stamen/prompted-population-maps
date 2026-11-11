@@ -407,6 +407,7 @@ that `prep.py` reads (boundaries, clipping, resolution, election data).
    - optional `bbox` (drop overseas territories), `lakes=True` (cut Natural Earth lakes from the land slab).
    - optional `top` (headroom above the region, default 0.22 of its extent) when tall spikes sit on the northern edge (Egypt, Mexico).
    - optional `res` to force a coarser H3 resolution when a scene is too big to render (the contiguous US at res 7 needs more than 14 GB).
+   - optional `parts` for places drawn at one scale but moved closer (see `usa_full`): each part has its own Natural Earth names, bounding boxes, cities, and a `place` rule relative to an earlier part. `prep.py` hands these regions to `prep_composite.py`. Kontur&#x27;s US file already includes PR, VI, GU, MP, and AS, so do not add their own files.
    - `cities`: `(name, lon, lat)` in label priority order; colliding labels are nudged, then dropped.
 2. `pipeline/make_map.sh &lt;region&gt; preview` and **look at the image**.
 3. Check the population total `prep.py` prints against an official figure. Within ~2% is normal.
@@ -503,13 +504,34 @@ R={
    cities=[(&#x27;Sydney&#x27;,151.21,-33.87),(&#x27;Melbourne&#x27;,144.96,-37.81),(&#x27;Brisbane&#x27;,153.03,-27.47),(&#x27;Perth&#x27;,115.86,-31.95),(&#x27;Adelaide&#x27;,138.6,-34.93),(&#x27;Canberra&#x27;,149.13,-35.28),(&#x27;Hobart&#x27;,147.33,-42.88),(&#x27;Darwin&#x27;,130.84,-12.46),(&#x27;Townsville&#x27;,146.82,-19.26),(&#x27;Cairns&#x27;,145.77,-16.92),(&#x27;Alice Springs&#x27;,133.88,-23.7),(&#x27;Newcastle&#x27;,151.78,-32.93)]),
  &#x27;egypt&#x27;:dict(title=&#x27;Egypt&#x27;,kontur=[&#x27;EG&#x27;],bnd=(&#x27;ne0&#x27;,[&#x27;Egypt&#x27;]),national=True,top=0.55,credit=&#x27;Natural Earth 1:10m (de facto boundaries)&#x27;,
    cities=[(&#x27;Cairo&#x27;,31.24,30.04),(&#x27;Alexandria&#x27;,29.92,31.2),(&#x27;Port Said&#x27;,32.3,31.26),(&#x27;Suez&#x27;,32.55,29.97),(&#x27;Mansoura&#x27;,31.38,31.04),(&#x27;Tanta&#x27;,31.0,30.79),(&#x27;Asyut&#x27;,31.18,27.18),(&#x27;Luxor&#x27;,32.64,25.69),(&#x27;Aswan&#x27;,32.9,24.09),(&#x27;Hurghada&#x27;,33.81,27.26),(&#x27;Siwa&#x27;,25.52,29.2),(&#x27;Marsa Matruh&#x27;,27.24,31.35)]),
+ # ---- the whole United States at one scale: each part keeps its own true size and shape, moved closer (prep_composite.py).
+ #      Kontur&#x27;s US file already includes PR, VI, GU, MP, and AS; adding their own files would double-count them.
+ &#x27;usa_full&#x27;:dict(title=&#x27;United States&#x27;,kontur=[&#x27;US&#x27;],national=True,res=6,lakes=True,bnd=None,
+   credit=&#x27;Natural Earth 1:10m (lakes removed). Alaska, Hawaii, and the territories are moved closer but drawn at the same scale&#x27;,
+   cities=[],
+   parts=[
+    dict(name=&#x27;Contiguous US&#x27;,ne=[&#x27;United States of America&#x27;],bbox=[(-125,24,-66.5,49.5)],
+         cities=[(&#x27;New York&#x27;,-74.0,40.7),(&#x27;Los Angeles&#x27;,-118.24,34.05),(&#x27;Chicago&#x27;,-87.63,41.88),(&#x27;Houston&#x27;,-95.37,29.76),(&#x27;Dallas&#x27;,-96.8,32.78),(&#x27;Miami&#x27;,-80.19,25.77),(&#x27;Atlanta&#x27;,-84.39,33.75),(&#x27;Seattle&#x27;,-122.33,47.61),(&#x27;Denver&#x27;,-104.99,39.74),(&#x27;Phoenix&#x27;,-112.07,33.45),(&#x27;San Francisco&#x27;,-122.42,37.77),(&#x27;Minneapolis&#x27;,-93.27,44.98)]),
+    dict(name=&#x27;Alaska&#x27;,ne=[&#x27;United States of America&#x27;],bbox=[(-180,51,-129,72),(172,51,180,54)],west_of_180=True,
+         place=dict(ref=&#x27;Contiguous US&#x27;,x=&#x27;left_of&#x27;,y=&#x27;align_top&#x27;,dy=500),cities=[(&#x27;Anchorage&#x27;,-149.9,61.22),(&#x27;Fairbanks&#x27;,-147.72,64.84),(&#x27;Juneau&#x27;,-134.42,58.3)]),
+    dict(name=&#x27;Hawaii&#x27;,ne=[&#x27;United States of America&#x27;],bbox=[(-161,18.5,-154.5,22.5)],
+         place=dict(ref=&#x27;Alaska&#x27;,x=&#x27;align_right&#x27;,y=&#x27;below&#x27;),cities=[(&#x27;Honolulu&#x27;,-157.86,21.31)]),
+    dict(name=&#x27;Guam and Northern Mariana Islands&#x27;,ne=[&#x27;Guam&#x27;,&#x27;Northern Mariana Islands&#x27;],bbox=[(144,13,146.5,21)],
+         place=dict(ref=&#x27;Hawaii&#x27;,x=&#x27;left_of&#x27;,y=&#x27;align_top&#x27;),cities=[(&#x27;Hagåtña&#x27;,144.75,13.47)]),
+    dict(name=&#x27;American Samoa&#x27;,ne=[&#x27;American Samoa&#x27;],bbox=[(-171.2,-14.6,-168,-11)],
+         place=dict(ref=&#x27;Hawaii&#x27;,x=&#x27;align_right&#x27;,y=&#x27;below&#x27;),cities=[(&#x27;Pago Pago&#x27;,-170.70,-14.28)]),
+    dict(name=&#x27;Puerto Rico and US Virgin Islands&#x27;,ne=[&#x27;Puerto Rico&#x27;,&#x27;United States Virgin Islands&#x27;],bbox=[(-68,17.5,-64.5,18.6)],
+         place=dict(ref=&#x27;Contiguous US&#x27;,x=&#x27;align_right&#x27;,y=&#x27;below&#x27;,dx=-700),cities=[(&#x27;San Juan&#x27;,-66.1,18.47)]),
+   ]),
 }
 </pre></div></details>
-  <details><summary>pipeline/prep.py<span>clip, aggregate, project, join elections · <a href="https://github.com/stamen/prompted-population-maps/blob/main/pipeline/prep.py" target="_blank" rel="noopener">on GitHub</a></span></summary><div class="codebox"><button class="copy" type="button">Copy</button><pre>import sys, numpy as np, pandas as pd, pyogrio, h3, geopandas as gpd, shapely, time
+  <details><summary>pipeline/prep.py<span>clip, aggregate, project, join elections · <a href="https://github.com/stamen/prompted-population-maps/blob/main/pipeline/prep.py" target="_blank" rel="noopener">on GitHub</a></span></summary><div class="codebox"><button class="copy" type="button">Copy</button><pre>import os, sys, numpy as np, pandas as pd, pyogrio, h3, geopandas as gpd, shapely, time
 from shapely.ops import unary_union
 from pyproj import Transformer
 import os; sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); from regions import *
 key=sys.argv[1]; c=R[key]; t=time.time()
+if &#x27;parts&#x27; in c:   # several places at one scale (e.g. the full US): see prep_composite.py
+    import runpy; runpy.run_path(os.path.join(os.path.dirname(os.path.abspath(__file__)),&#x27;prep_composite.py&#x27;),run_name=&#x27;__main__&#x27;); sys.exit()
 b=c[&#x27;bnd&#x27;]
 if b[0]==&#x27;census&#x27;: g=gpd.read_file(CENSUS); g=g[g.STUSPS==b[1]].to_crs(4326).geometry
 elif b[0]==&#x27;ne0&#x27;: g=gpd.read_file(NE0); g=g[g.ADMIN.isin(b[1])].geometry
@@ -674,13 +696,16 @@ s.render.pixel_aspect_x=1/math.cos(tilt); s.render.pixel_aspect_y=1.0; bpy.conte
 from pyproj import Transformer
 lon0,lat0,pcx,pcy=d[&#x27;proj&#x27;]; tr=Transformer.from_crs(4326,f&#x27;+proj=laea +lat_0={lat0} +lon_0={lon0} +units=km&#x27;,always_xy=True)
 CX,CY=X.mean(1),Y.mean(1); lab=[]; rad=max(12,0.016*S)
-for name,lon,lat in c[&#x27;cities&#x27;]:
-    ex,ey=tr.transform(lon,lat); ex-=pcx; ey-=pcy
+cities_xy=[tuple(q) for q in d[&#x27;city_xy&#x27;]] if &#x27;city_xy&#x27; in d.files else [(n_,*(np.array(tr.transform(lo,la))-[pcx,pcy])) for n_,lo,la in c[&#x27;cities&#x27;]]
+for name,ex,ey in cities_xy:
     m=np.where((CX-ex)**2+(CY-ey)**2&lt;rad**2)[0]
     if len(m)==0: print(&#x27;no cells near&#x27;,name); continue
     sky=np.sort(h[m])[-min(25,len(m))]; j=m[np.argmin(np.abs(h[m]-sky))]
     v=world_to_camera_view(s,co,Vector((CX[j],CY[j],h[j]))); lab.append((name,v.x*WPX,(1-v.y)*HPX))
-meta=dict(labels=lab,cells=int(n),res=int(d[&#x27;res&#x27;]),cell_km2=float(np.median(d[&#x27;area&#x27;])),pop=float(d[&#x27;pop&#x27;].sum()))
+parts_lab=[]
+for name,px_,py_ in (d[&#x27;part_xy&#x27;] if &#x27;part_xy&#x27; in d.files else []):   # caption under each moved part of a composite map
+    v=world_to_camera_view(s,co,Vector((px_,py_,0))); parts_lab.append((name,v.x*WPX,(1-v.y)*HPX))
+meta=dict(parts=parts_lab,labels=lab,cells=int(n),res=int(d[&#x27;res&#x27;]),cell_km2=float(np.median(d[&#x27;area&#x27;])),pop=float(d[&#x27;pop&#x27;].sum()))
 json.dump(meta,open(OUT.rsplit(&#x27;.&#x27;,1)[0]+&#x27;_meta.json&#x27;,&#x27;w&#x27;))
 s.render.engine=&#x27;CYCLES&#x27;; s.cycles.device=&#x27;CPU&#x27;; s.cycles.samples=SPP; s.cycles.use_denoising=True; s.cycles.max_bounces=4
 s.view_settings.view_transform=&#x27;AgX&#x27;; s.view_settings.look=&#x27;AgX - Medium High Contrast&#x27;
@@ -753,8 +778,9 @@ else:
     # callout: what the stairs mean, and what the spike heights mean
     d=np.load(f&#x27;{WORK}/{key}.npz&#x27;,allow_pickle=True); dens=d[&#x27;pop&#x27;]/d[&#x27;area&#x27;]; i=int(np.argmax(dens))
     lon0,lat0,pcx,pcy=d[&#x27;proj&#x27;]; tr=Transformer.from_crs(4326,f&#x27;+proj=laea +lat_0={lat0} +lon_0={lon0} +units=km&#x27;,always_xy=True)
-    mxk,myk=d[&#x27;x&#x27;][i].mean()+pcx,d[&#x27;y&#x27;][i].mean()+pcy
-    near=min(c[&#x27;cities&#x27;],key=lambda q:np.hypot(*(np.array(tr.transform(q[1],q[2]))-[mxk,myk])))[0]
+    mxk,myk=d[&#x27;x&#x27;][i].mean(),d[&#x27;y&#x27;][i].mean()
+    cxy=[tuple(q) for q in d[&#x27;city_xy&#x27;]] if &#x27;city_xy&#x27; in d.files else [(n_,*(np.array(tr.transform(lo,la))-[pcx,pcy])) for n_,lo,la in c[&#x27;cities&#x27;]]
+    near=min(cxy,key=lambda q:np.hypot(q[1]-mxk,q[2]-myk))[0]
     lines=[(&#x27;Each color step is 10× denser&#x27;,fLb,ink),
            (&#x27;Darkest blue (10,000+ people/km²) is 10,000× denser than darkest red (≤1).&#x27;,fL,sub),
            (f&#x27;Spike height is linear: the tallest, in {near}, is {dens[i]:,.0f} people/km².&#x27;,fL,sub)]
@@ -779,6 +805,8 @@ for name,px,py in meta[&#x27;labels&#x27;]:
     do.rounded_rectangle([x+U*0.0012,y+U*0.0018,x+bw+U*0.0012,y+bh+U*0.0018],radius=bh/2,fill=(40,28,18,55))   # soft drop shadow
     do.rounded_rectangle([x,y,x+bw,y+bh],radius=bh/2,fill=(*cream,232),outline=(150,128,104,200),width=max(1,int(U/1400)))
     texts.append((x+bw/2-(l_+r_)/2,y+bh/2+capH/2,name))         # baseline so capitals sit centered; ink box centered horizontally
+for name,px,py in meta.get(&#x27;parts&#x27;,[]):   # composite maps: small caption under each moved part
+    w=dr.textlength(name,font=fL); dr.text((px-w/2,py+U*0.008),name,font=fL,fill=sub)
 ov=ov.filter(ImageFilter.GaussianBlur(0)) ; im=Image.alpha_composite(im.convert(&#x27;RGBA&#x27;),ov).convert(&#x27;RGB&#x27;); dr=ImageDraw.Draw(im)
 for x,y,name in texts: dr.text((x,y),name,font=fN,fill=ink,anchor=&#x27;ls&#x27;)
 im.save(OUT,optimize=True)
@@ -951,7 +979,15 @@ print(f&quot;254 counties  D {t.d.sum():,.0f}  R {t.r.sum():,.0f}  total {t.tot.
     <li>Egypt's people really are confined to the Nile valley and delta, which the vibes version got roughly right, but the real valley is far narrower and the delta far denser.</li>
     <li>The contiguous United States, Brazil, and Australia show the texture no guess can supply: highways, rivers, irrigated valleys, and small towns.</li>
   </ul>
-  <p class="col muted small">Totals match official figures within about 2%, except Brazil and Egypt, where Kontur's totals (216 and 113 million) follow UN 2023 estimates rather than national counts (Brazil's 2022 census found 203 million; Egypt's statistics agency reported about 105 million in 2023). The contiguous US map omits Alaska, Hawaii, and the territories, and the Russia map omits the part of Chukotka east of 180°. The US is summed to larger cells (H3 resolution 6, about 36 km²), because at the finer resolution the scene needs more than 14 GB of memory to render.</p>
+  <div class="stack col" style="gap:10px">
+    <h3>The whole United States, at one scale</h3>
+    <p>The contiguous map above leaves out Alaska, Hawaii, and the territories. Here they are, each in its own equal-area projection and moved closer, but not resized: a kilometer is the same length everywhere on this map, which is why Alaska is so large and Guam and American Samoa are specks.</p>
+  </div>
+  <div class="gallery" style="columns:1">
+    <figure><a class="plate" href="full/usa_full.jpg" target="_blank" rel="noopener"><img src="img/usa_full.jpg" alt="United States, raytraced 3D hexagon map" width="1600" height="1063" loading="lazy"></a>
+      <figcaption><b>United States</b><span class="num">340.2 million · 189,820 cells · res 6 (~36.98 km²)</span></figcaption></figure>
+  </div>
+  <p class="col muted small">Totals match official figures within about 2%, except Brazil and Egypt, where Kontur's totals (216 and 113 million) follow UN 2023 estimates rather than national counts (Brazil's 2022 census found 203 million; Egypt's statistics agency reported about 105 million in 2023). The Russia map omits the part of Chukotka east of 180°. The US is summed to larger cells (H3 resolution 6, about 36 km²), because at the finer resolution the scene needs more than 14 GB of memory to render. Kontur counts about 604,000 people in Alaska, below the official figure of about 733,000.</p>
 </section>
 <!--REAL7_END-->
 </div>

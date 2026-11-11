@@ -1,8 +1,10 @@
-import sys, numpy as np, pandas as pd, pyogrio, h3, geopandas as gpd, shapely, time
+import os, sys, numpy as np, pandas as pd, pyogrio, h3, geopandas as gpd, shapely, time
 from shapely.ops import unary_union
 from pyproj import Transformer
 import os; sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); from regions import *
 key=sys.argv[1]; c=R[key]; t=time.time()
+if 'parts' in c:   # several places at one scale (e.g. the full US): see prep_composite.py
+    import runpy; runpy.run_path(os.path.join(os.path.dirname(os.path.abspath(__file__)),'prep_composite.py'),run_name='__main__'); sys.exit()
 b=c['bnd']
 if b[0]=='census': g=gpd.read_file(CENSUS); g=g[g.STUSPS==b[1]].to_crs(4326).geometry
 elif b[0]=='ne0': g=gpd.read_file(NE0); g=g[g.ADMIN.isin(b[1])].geometry

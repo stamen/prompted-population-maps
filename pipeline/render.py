@@ -89,13 +89,16 @@ s.render.pixel_aspect_x=1/math.cos(tilt); s.render.pixel_aspect_y=1.0; bpy.conte
 from pyproj import Transformer
 lon0,lat0,pcx,pcy=d['proj']; tr=Transformer.from_crs(4326,f'+proj=laea +lat_0={lat0} +lon_0={lon0} +units=km',always_xy=True)
 CX,CY=X.mean(1),Y.mean(1); lab=[]; rad=max(12,0.016*S)
-for name,lon,lat in c['cities']:
-    ex,ey=tr.transform(lon,lat); ex-=pcx; ey-=pcy
+cities_xy=[tuple(q) for q in d['city_xy']] if 'city_xy' in d.files else [(n_,*(np.array(tr.transform(lo,la))-[pcx,pcy])) for n_,lo,la in c['cities']]
+for name,ex,ey in cities_xy:
     m=np.where((CX-ex)**2+(CY-ey)**2<rad**2)[0]
     if len(m)==0: print('no cells near',name); continue
     sky=np.sort(h[m])[-min(25,len(m))]; j=m[np.argmin(np.abs(h[m]-sky))]
     v=world_to_camera_view(s,co,Vector((CX[j],CY[j],h[j]))); lab.append((name,v.x*WPX,(1-v.y)*HPX))
-meta=dict(labels=lab,cells=int(n),res=int(d['res']),cell_km2=float(np.median(d['area'])),pop=float(d['pop'].sum()))
+parts_lab=[]
+for name,px_,py_ in (d['part_xy'] if 'part_xy' in d.files else []):   # caption under each moved part of a composite map
+    v=world_to_camera_view(s,co,Vector((px_,py_,0))); parts_lab.append((name,v.x*WPX,(1-v.y)*HPX))
+meta=dict(parts=parts_lab,labels=lab,cells=int(n),res=int(d['res']),cell_km2=float(np.median(d['area'])),pop=float(d['pop'].sum()))
 json.dump(meta,open(OUT.rsplit('.',1)[0]+'_meta.json','w'))
 s.render.engine='CYCLES'; s.cycles.device='CPU'; s.cycles.samples=SPP; s.cycles.use_denoising=True; s.cycles.max_bounces=4
 s.view_settings.view_transform='AgX'; s.view_settings.look='AgX - Medium High Contrast'
