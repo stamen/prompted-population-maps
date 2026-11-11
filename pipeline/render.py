@@ -94,12 +94,14 @@ for name,ex,ey in cities_xy:
     m=np.where((CX-ex)**2+(CY-ey)**2<rad**2)[0]
     if len(m)==0: print('no cells near',name); continue
     sky=np.sort(h[m])[-min(25,len(m))]; j=m[np.argmin(np.abs(h[m]-sky))]
-    v=world_to_camera_view(s,co,Vector((CX[j],CY[j],h[j]))); lab.append((name,v.x*WPX,(1-v.y)*HPX))
+    # label sits at the city's own coordinates, raised to its visible skyline height
+    v=world_to_camera_view(s,co,Vector((ex,ey,h[j]))); lab.append((name,v.x*WPX,(1-v.y)*HPX))
 parts_lab=[]
 for name,px_,py_ in (d['part_xy'] if 'part_xy' in d.files else []):   # caption under each moved part of a composite map
     v=world_to_camera_view(s,co,Vector((px_,py_,0))); parts_lab.append((name,v.x*WPX,(1-v.y)*HPX))
 meta=dict(parts=parts_lab,labels=lab,cells=int(n),res=int(d['res']),cell_km2=float(np.median(d['area'])),pop=float(d['pop'].sum()))
 json.dump(meta,open(OUT.rsplit('.',1)[0]+'_meta.json','w'))
+if os.environ.get('POPMAPS_LABELS_ONLY'): sys.exit(0)   # recompute label anchors without rendering
 s.render.engine='CYCLES'; s.cycles.device='CPU'; s.cycles.samples=SPP; s.cycles.use_denoising=True; s.cycles.max_bounces=4
 s.view_settings.view_transform='AgX'; s.view_settings.look='AgX - Medium High Contrast'
 s.render.image_settings.file_format='PNG'; s.render.filepath=OUT
