@@ -42,7 +42,7 @@ R={
  'germany':dict(title='Germany',kontur=['DE'],bnd=('ne0',['Germany']),national=True,credit='Natural Earth 1:10m',
    cities=[('Berlin',13.40,52.52),('Hamburg',9.99,53.55),('Munich',11.58,48.14),('Cologne',6.96,50.94),('Frankfurt',8.68,50.11),('Stuttgart',9.18,48.78),('Düsseldorf',6.77,51.23),('Leipzig',12.37,51.34),('Dresden',13.74,51.05),('Hanover',9.73,52.37),('Nuremberg',11.08,49.45),('Bremen',8.80,53.08),('Dortmund',7.47,51.51)]),
  # ---- the seven countries first made "with vibes" (see the site), now from real data
- 'usa':dict(title='United States (contiguous)',kontur=['US'],bnd=('ne0',['United States of America']),national=True,bbox=(-125,24,-66.5,49.5),credit='Natural Earth 1:10m (contiguous 48 states)',
+ 'usa':dict(title='United States (contiguous)',kontur=['US'],bnd=('ne0',['United States of America']),national=True,res=6,bbox=(-125,24,-66.5,49.5),credit='Natural Earth 1:10m (contiguous 48 states)',
    cities=[('New York',-74.0,40.7),('Los Angeles',-118.24,34.05),('Chicago',-87.63,41.88),('Houston',-95.37,29.76),('Dallas',-96.8,32.78),('Miami',-80.19,25.77),('Atlanta',-84.39,33.75),('Seattle',-122.33,47.61),('Denver',-104.99,39.74),('Phoenix',-112.07,33.45),('San Francisco',-122.42,37.77),('Minneapolis',-93.27,44.98)]),
  'russia':dict(title='Russia',kontur=['RU'],bnd=('ne0',['Russia']),national=True,bbox=(19,41,180,82),credit='Natural Earth 1:10m (de facto boundaries; Chukotka east of 180° omitted)',
    cities=[('Moscow',37.62,55.75),('St Petersburg',30.32,59.94),('Novosibirsk',82.92,55.03),('Yekaterinburg',60.6,56.84),('Kazan',49.11,55.79),('Rostov-on-Don',39.7,47.23),('Krasnoyarsk',92.87,56.01),('Omsk',73.37,54.99),('Irkutsk',104.3,52.29),('Vladivostok',131.89,43.12),('Khabarovsk',135.07,48.48),('Yakutsk',129.73,62.03)]),

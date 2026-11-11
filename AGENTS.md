@@ -56,6 +56,7 @@ that `prep.py` reads (boundaries, clipping, resolution, election data).
    - `national=True` only when the Kontur file covers exactly that territory (keeps coastal cells with a 3 km buffer).
    - optional `bbox` (drop overseas territories), `lakes=True` (cut Natural Earth lakes from the land slab).
    - optional `top` (headroom above the region, default 0.22 of its extent) when tall spikes sit on the northern edge (Egypt, Mexico).
+   - optional `res` to force a coarser H3 resolution when a scene is too big to render (the contiguous US at res 7 needs more than 14 GB).
    - `cities`: `(name, lon, lat)` in label priority order; colliding labels are nudged, then dropped.
 2. `pipeline/make_map.sh <region> preview` and **look at the image**.
 3. Check the population total `prep.py` prints against an official figure. Within ~2% is normal.

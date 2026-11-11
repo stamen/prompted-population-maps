@@ -379,6 +379,7 @@ that `prep.py` reads (boundaries, clipping, resolution, election data).
    - `national=True` only when the Kontur file covers exactly that territory (keeps coastal cells with a 3 km buffer).
    - optional `bbox` (drop overseas territories), `lakes=True` (cut Natural Earth lakes from the land slab).
    - optional `top` (headroom above the region, default 0.22 of its extent) when tall spikes sit on the northern edge (Egypt, Mexico).
+   - optional `res` to force a coarser H3 resolution when a scene is too big to render (the contiguous US at res 7 needs more than 14 GB).
    - `cities`: `(name, lon, lat)` in label priority order; colliding labels are nudged, then dropped.
 2. `pipeline/make_map.sh &lt;region&gt; preview` and **look at the image**.
 3. Check the population total `prep.py` prints against an official figure. Within ~2% is normal.
@@ -461,7 +462,7 @@ R={
  &#x27;germany&#x27;:dict(title=&#x27;Germany&#x27;,kontur=[&#x27;DE&#x27;],bnd=(&#x27;ne0&#x27;,[&#x27;Germany&#x27;]),national=True,credit=&#x27;Natural Earth 1:10m&#x27;,
    cities=[(&#x27;Berlin&#x27;,13.40,52.52),(&#x27;Hamburg&#x27;,9.99,53.55),(&#x27;Munich&#x27;,11.58,48.14),(&#x27;Cologne&#x27;,6.96,50.94),(&#x27;Frankfurt&#x27;,8.68,50.11),(&#x27;Stuttgart&#x27;,9.18,48.78),(&#x27;Düsseldorf&#x27;,6.77,51.23),(&#x27;Leipzig&#x27;,12.37,51.34),(&#x27;Dresden&#x27;,13.74,51.05),(&#x27;Hanover&#x27;,9.73,52.37),(&#x27;Nuremberg&#x27;,11.08,49.45),(&#x27;Bremen&#x27;,8.80,53.08),(&#x27;Dortmund&#x27;,7.47,51.51)]),
  # ---- the seven countries first made &quot;with vibes&quot; (see the site), now from real data
- &#x27;usa&#x27;:dict(title=&#x27;United States (contiguous)&#x27;,kontur=[&#x27;US&#x27;],bnd=(&#x27;ne0&#x27;,[&#x27;United States of America&#x27;]),national=True,bbox=(-125,24,-66.5,49.5),credit=&#x27;Natural Earth 1:10m (contiguous 48 states)&#x27;,
+ &#x27;usa&#x27;:dict(title=&#x27;United States (contiguous)&#x27;,kontur=[&#x27;US&#x27;],bnd=(&#x27;ne0&#x27;,[&#x27;United States of America&#x27;]),national=True,res=6,bbox=(-125,24,-66.5,49.5),credit=&#x27;Natural Earth 1:10m (contiguous 48 states)&#x27;,
    cities=[(&#x27;New York&#x27;,-74.0,40.7),(&#x27;Los Angeles&#x27;,-118.24,34.05),(&#x27;Chicago&#x27;,-87.63,41.88),(&#x27;Houston&#x27;,-95.37,29.76),(&#x27;Dallas&#x27;,-96.8,32.78),(&#x27;Miami&#x27;,-80.19,25.77),(&#x27;Atlanta&#x27;,-84.39,33.75),(&#x27;Seattle&#x27;,-122.33,47.61),(&#x27;Denver&#x27;,-104.99,39.74),(&#x27;Phoenix&#x27;,-112.07,33.45),(&#x27;San Francisco&#x27;,-122.42,37.77),(&#x27;Minneapolis&#x27;,-93.27,44.98)]),
  &#x27;russia&#x27;:dict(title=&#x27;Russia&#x27;,kontur=[&#x27;RU&#x27;],bnd=(&#x27;ne0&#x27;,[&#x27;Russia&#x27;]),national=True,bbox=(19,41,180,82),credit=&#x27;Natural Earth 1:10m (de facto boundaries; Chukotka east of 180° omitted)&#x27;,
    cities=[(&#x27;Moscow&#x27;,37.62,55.75),(&#x27;St Petersburg&#x27;,30.32,59.94),(&#x27;Novosibirsk&#x27;,82.92,55.03),(&#x27;Yekaterinburg&#x27;,60.6,56.84),(&#x27;Kazan&#x27;,49.11,55.79),(&#x27;Rostov-on-Don&#x27;,39.7,47.23),(&#x27;Krasnoyarsk&#x27;,92.87,56.01),(&#x27;Omsk&#x27;,73.37,54.99),(&#x27;Irkutsk&#x27;,104.3,52.29),(&#x27;Vladivostok&#x27;,131.89,43.12),(&#x27;Khabarovsk&#x27;,135.07,48.48),(&#x27;Yakutsk&#x27;,129.73,62.03)]),
@@ -497,7 +498,7 @@ tr=Transformer.from_crs(4326,f&#x27;+proj=laea +lat_0={lat0} +lon_0={lon0} +unit
 gp=shapely.ops.transform(lambda x,y:tr.transform(x,y),geom)
 gl=shapely.ops.transform(lambda x,y:tr.transform(x,y),land)
 S=max(gp.bounds[2]-gp.bounds[0],gp.bounds[3]-gp.bounds[1])
-res=8 if S&lt;=2000 else 7
+res=c.get(&#x27;res&#x27;) or (8 if S&lt;=2000 else 7)   # &#x27;res&#x27; overrides (e.g. 6 for the contiguous US, which needs &gt;14 GB to render at res 7)
 cells=df.h3.values; pop=df.population.values.astype(float)
 if res&lt;8:   # sum Kontur res-8 populations into their res-7 parents (real totals, coarser cells)
     par=np.array([h3.cell_to_parent(x,res) for x in cells]); s=pd.Series(pop).groupby(par).sum(); cells=s.index.values; pop=s.values
@@ -893,7 +894,39 @@ print(f&quot;254 counties  D {t.d.sum():,.0f}  R {t.r.sum():,.0f}  total {t.tot.
   <p class="col muted small">Together they show why faking stays tempting: the look is the easy part to imitate, and the errors only show up when you check the geography, the numbers, and the text against a real source.</p>
 </section>
 
+<!--REAL7_START-->
+<section class="stack" style="gap:28px">
+  <div class="stack col">
+    <span class="eyebrow">Back to real data</span>
+    <h2>The same seven countries, for real</h2>
+    <p>The same pipeline, run on the same seven countries with real data: Kontur population, Natural Earth boundaries, and nothing typed from memory. Each one needed a single config entry and a preview, then 4–15 minutes of rendering.</p>
+  </div>
+  <div class="gallery">
+    <figure><a class="plate" href="full/usa.jpg" target="_blank" rel="noopener"><img src="img/usa.jpg" alt="United States (contiguous), raytraced 3D hexagon map" width="1600" height="1343" loading="lazy"></a>
+      <figcaption><b>United States (contiguous)</b><span class="num">334.5 million · 186,740 cells · res 6 (~37.01 km²)</span></figcaption></figure>
+    <figure><a class="plate" href="full/russia.jpg" target="_blank" rel="noopener"><img src="img/russia.jpg" alt="Russia, raytraced 3D hexagon map" width="1600" height="1192" loading="lazy"></a>
+      <figcaption><b>Russia</b><span class="num">143.4 million · 347,899 cells · res 7 (~5.17 km²)</span></figcaption></figure>
+    <figure><a class="plate" href="full/japan.jpg" target="_blank" rel="noopener"><img src="img/japan.jpg" alt="Japan, raytraced 3D hexagon map" width="1600" height="2052" loading="lazy"></a>
+      <figcaption><b>Japan</b><span class="num">123.2 million · 54,310 cells · res 7 (~4.60 km²)</span></figcaption></figure>
+    <figure><a class="plate" href="full/mexico.jpg" target="_blank" rel="noopener"><img src="img/mexico.jpg" alt="Mexico, raytraced 3D hexagon map" width="1600" height="1540" loading="lazy"></a>
+      <figcaption><b>Mexico</b><span class="num">128.6 million · 147,422 cells · res 7 (~6.02 km²)</span></figcaption></figure>
+    <figure><a class="plate" href="full/brazil.jpg" target="_blank" rel="noopener"><img src="img/brazil.jpg" alt="Brazil, raytraced 3D hexagon map" width="1600" height="1841" loading="lazy"></a>
+      <figcaption><b>Brazil</b><span class="num">216.3 million · 599,878 cells · res 7 (~5.60 km²)</span></figcaption></figure>
+    <figure><a class="plate" href="full/australia.jpg" target="_blank" rel="noopener"><img src="img/australia.jpg" alt="Australia, raytraced 3D hexagon map" width="1600" height="1778" loading="lazy"></a>
+      <figcaption><b>Australia</b><span class="num">26.4 million · 218,130 cells · res 7 (~5.91 km²)</span></figcaption></figure>
+    <figure><a class="plate" href="full/egypt.jpg" target="_blank" rel="noopener"><img src="img/egypt.jpg" alt="Egypt, raytraced 3D hexagon map" width="1600" height="2137" loading="lazy"></a>
+      <figcaption><b>Egypt</b><span class="num">112.7 million · 95,697 cells · res 8 (~0.87 km²)</span></figcaption></figure>
 
+  </div>
+  <ul class="tight col">
+    <li>Japan is mostly red and white with blue coastal plains, not blue everywhere: the mountainous interior is nearly empty, which the guessed rural density missed.</li>
+    <li>Russia's population follows a narrow band along the south of Siberia and the Trans-Siberian corridor, instead of a smooth fade from west to east.</li>
+    <li>Egypt's people really are confined to the Nile valley and delta, which the vibes version got roughly right, but the real valley is far narrower and the delta far denser.</li>
+    <li>The contiguous United States, Brazil, and Australia show the texture no guess can supply: highways, rivers, irrigated valleys, and small towns.</li>
+  </ul>
+  <p class="col muted small">Totals match official figures within about 2%, except Brazil and Egypt, where Kontur's totals (216 and 113 million) follow UN 2023 estimates rather than national counts (Brazil's 2022 census found 203 million; Egypt's statistics agency reported about 105 million in 2023). The contiguous US map omits Alaska, Hawaii, and the territories, and the Russia map omits the part of Chukotka east of 180°.</p>
+</section>
+<!--REAL7_END-->
 </div>
 <script>
 document.querySelectorAll('.copy').forEach(function(b){

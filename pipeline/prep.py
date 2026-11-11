@@ -18,7 +18,7 @@ tr=Transformer.from_crs(4326,f'+proj=laea +lat_0={lat0} +lon_0={lon0} +units=km'
 gp=shapely.ops.transform(lambda x,y:tr.transform(x,y),geom)
 gl=shapely.ops.transform(lambda x,y:tr.transform(x,y),land)
 S=max(gp.bounds[2]-gp.bounds[0],gp.bounds[3]-gp.bounds[1])
-res=8 if S<=2000 else 7
+res=c.get('res') or (8 if S<=2000 else 7)   # 'res' overrides (e.g. 6 for the contiguous US, which needs >14 GB to render at res 7)
 cells=df.h3.values; pop=df.population.values.astype(float)
 if res<8:   # sum Kontur res-8 populations into their res-7 parents (real totals, coarser cells)
     par=np.array([h3.cell_to_parent(x,res) for x in cells]); s=pd.Series(pop).groupby(par).sum(); cells=s.index.values; pop=s.values
