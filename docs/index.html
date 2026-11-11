@@ -82,6 +82,7 @@ details[open] summary{border-bottom:1px solid var(--rule)}
 .card.b{border-top-color:var(--blue)}
 .card p{font-size:.93rem}
 .intro{margin:0;border-left:3px solid var(--red);padding:4px 0 4px 24px;display:flex;flex-direction:column;gap:16px;max-width:68ch;font-style:italic;font-size:1.05rem}
+.intro em{font-style:normal}
 .intro cite{font-style:normal;font:500 .8rem var(--f-mono);letter-spacing:.06em;color:var(--muted)}
 .prompt{border:1px solid var(--rule);border-radius:4px;background:var(--plate);padding:16px;display:flex;flex-direction:column;gap:10px;position:relative}
 .prompt pre{white-space:pre-wrap}
@@ -150,6 +151,19 @@ details[open] summary{border-bottom:1px solid var(--rule)}
       <figcaption><b>China</b><span class="num">1.43 billion · 821,724 cells · res 7 (~4.34 km²)</span></figcaption></figure>
 
   </div>
+</section>
+
+<section class="stack" style="gap:20px">
+  <div class="stack col">
+    <span class="eyebrow">In the author's words</span>
+    <h2>Why these maps, and why these colors?</h2>
+  </div>
+  <blockquote class="intro">
+    <p>Why these specific maps? I chose these states and countries just to reproduce the <a href="https://www.threads.com/share/BAcMhPxj1t">AI-generated fake-data versions I saw online</a>. But you could create your own by following the instructions further down in this post.</p>
+    <p>And why these colors? The original post I saw was a map of Texas using this color scheme, so I decided to stick with it. I wouldn’t have picked this red-white-and-blue scheme myself, but possibly it was meant to evoke the Texas flag or the US flag. But since the map was also posted shortly after the 2026 midterm elections, it’s also probably meant to add to the “land doesn’t vote” narrative, showing how “blue” Democratic votes are concentrated in cities and “red” Republican votes tend to be in low-density rural areas. To be honest, using this color scheme on a map like this around the election makes me a bit uncomfortable: it feels like we’re trying to make an election map but without using real data. Will people incorrectly interpret these previous maps as election results?</p>
+    <p>So, I was curious if we <em>could</em> color these with election results instead? Here is one using county-level results from the 2026 Senate election (precinct-level results are not available yet) and another with the 2024 presidential results to see what finer-grained precinct-level results will look like. The maps are certainly more complex and messy, but that’s what the real world is like:</p>
+    <cite>— Alan McConchie</cite>
+  </blockquote>
 </section>
 
 <section class="stack" style="gap:28px">
@@ -352,6 +366,7 @@ that `prep.py` reads (boundaries, clipping, resolution, election data).
      (prep.py filters `admin==&#x27;Canada&#x27;`; generalize that filter for other countries), `(&#x27;census&#x27;, &#x27;ST&#x27;)` for US states.
    - `national=True` only when the Kontur file covers exactly that territory (keeps coastal cells with a 3 km buffer).
    - optional `bbox` (drop overseas territories), `lakes=True` (cut Natural Earth lakes from the land slab).
+   - optional `top` (headroom above the region, default 0.22 of its extent) when tall spikes sit on the northern edge (Egypt, Mexico).
    - `cities`: `(name, lon, lat)` in label priority order; colliding labels are nudged, then dropped.
 2. `pipeline/make_map.sh &lt;region&gt; preview` and **look at the image**.
 3. Check the population total `prep.py` prints against an official figure. Within ~2% is normal.
@@ -433,6 +448,21 @@ R={
    cities=[(&#x27;Toronto&#x27;,-79.38,43.65),(&#x27;Ottawa&#x27;,-75.70,45.42),(&#x27;Hamilton&#x27;,-79.87,43.26),(&#x27;London&#x27;,-81.25,42.98),(&#x27;Windsor&#x27;,-83.03,42.31),(&#x27;Kitchener&#x27;,-80.49,43.45),(&#x27;Sudbury&#x27;,-80.99,46.49),(&#x27;Thunder Bay&#x27;,-89.25,48.38),(&#x27;Kingston&#x27;,-76.48,44.23),(&#x27;Sault Ste. Marie&#x27;,-84.33,46.52),(&#x27;Timmins&#x27;,-81.33,48.48),(&#x27;Moosonee&#x27;,-80.65,51.27)]),
  &#x27;germany&#x27;:dict(title=&#x27;Germany&#x27;,kontur=[&#x27;DE&#x27;],bnd=(&#x27;ne0&#x27;,[&#x27;Germany&#x27;]),national=True,credit=&#x27;Natural Earth 1:10m&#x27;,
    cities=[(&#x27;Berlin&#x27;,13.40,52.52),(&#x27;Hamburg&#x27;,9.99,53.55),(&#x27;Munich&#x27;,11.58,48.14),(&#x27;Cologne&#x27;,6.96,50.94),(&#x27;Frankfurt&#x27;,8.68,50.11),(&#x27;Stuttgart&#x27;,9.18,48.78),(&#x27;Düsseldorf&#x27;,6.77,51.23),(&#x27;Leipzig&#x27;,12.37,51.34),(&#x27;Dresden&#x27;,13.74,51.05),(&#x27;Hanover&#x27;,9.73,52.37),(&#x27;Nuremberg&#x27;,11.08,49.45),(&#x27;Bremen&#x27;,8.80,53.08),(&#x27;Dortmund&#x27;,7.47,51.51)]),
+ # ---- the seven countries first made &quot;with vibes&quot; (see the site), now from real data
+ &#x27;usa&#x27;:dict(title=&#x27;United States (contiguous)&#x27;,kontur=[&#x27;US&#x27;],bnd=(&#x27;ne0&#x27;,[&#x27;United States of America&#x27;]),national=True,bbox=(-125,24,-66.5,49.5),credit=&#x27;Natural Earth 1:10m (contiguous 48 states)&#x27;,
+   cities=[(&#x27;New York&#x27;,-74.0,40.7),(&#x27;Los Angeles&#x27;,-118.24,34.05),(&#x27;Chicago&#x27;,-87.63,41.88),(&#x27;Houston&#x27;,-95.37,29.76),(&#x27;Dallas&#x27;,-96.8,32.78),(&#x27;Miami&#x27;,-80.19,25.77),(&#x27;Atlanta&#x27;,-84.39,33.75),(&#x27;Seattle&#x27;,-122.33,47.61),(&#x27;Denver&#x27;,-104.99,39.74),(&#x27;Phoenix&#x27;,-112.07,33.45),(&#x27;San Francisco&#x27;,-122.42,37.77),(&#x27;Minneapolis&#x27;,-93.27,44.98)]),
+ &#x27;russia&#x27;:dict(title=&#x27;Russia&#x27;,kontur=[&#x27;RU&#x27;],bnd=(&#x27;ne0&#x27;,[&#x27;Russia&#x27;]),national=True,bbox=(19,41,180,82),credit=&#x27;Natural Earth 1:10m (de facto boundaries; Chukotka east of 180° omitted)&#x27;,
+   cities=[(&#x27;Moscow&#x27;,37.62,55.75),(&#x27;St Petersburg&#x27;,30.32,59.94),(&#x27;Novosibirsk&#x27;,82.92,55.03),(&#x27;Yekaterinburg&#x27;,60.6,56.84),(&#x27;Kazan&#x27;,49.11,55.79),(&#x27;Rostov-on-Don&#x27;,39.7,47.23),(&#x27;Krasnoyarsk&#x27;,92.87,56.01),(&#x27;Omsk&#x27;,73.37,54.99),(&#x27;Irkutsk&#x27;,104.3,52.29),(&#x27;Vladivostok&#x27;,131.89,43.12),(&#x27;Khabarovsk&#x27;,135.07,48.48),(&#x27;Yakutsk&#x27;,129.73,62.03)]),
+ &#x27;japan&#x27;:dict(title=&#x27;Japan&#x27;,kontur=[&#x27;JP&#x27;],bnd=(&#x27;ne0&#x27;,[&#x27;Japan&#x27;]),national=True,bbox=(122,24,146.5,46),credit=&#x27;Natural Earth 1:10m (remote Pacific islands omitted)&#x27;,
+   cities=[(&#x27;Tokyo&#x27;,139.69,35.69),(&#x27;Osaka&#x27;,135.5,34.69),(&#x27;Nagoya&#x27;,136.91,35.18),(&#x27;Fukuoka&#x27;,130.4,33.59),(&#x27;Sapporo&#x27;,141.35,43.06),(&#x27;Sendai&#x27;,140.87,38.27),(&#x27;Hiroshima&#x27;,132.46,34.39),(&#x27;Niigata&#x27;,139.04,37.92),(&#x27;Kagoshima&#x27;,130.56,31.6),(&#x27;Naha&#x27;,127.68,26.21),(&#x27;Kanazawa&#x27;,136.65,36.56),(&#x27;Kochi&#x27;,133.53,33.56)]),
+ &#x27;mexico&#x27;:dict(title=&#x27;Mexico&#x27;,kontur=[&#x27;MX&#x27;],bnd=(&#x27;ne0&#x27;,[&#x27;Mexico&#x27;]),national=True,top=0.32,bbox=(-117.5,14,-86,33),credit=&#x27;Natural Earth 1:10m (remote Pacific islands omitted)&#x27;,
+   cities=[(&#x27;Mexico City&#x27;,-99.13,19.43),(&#x27;Guadalajara&#x27;,-103.35,20.67),(&#x27;Monterrey&#x27;,-100.31,25.69),(&#x27;Puebla&#x27;,-98.2,19.04),(&#x27;Tijuana&#x27;,-117.04,32.51),(&#x27;León&#x27;,-101.68,21.12),(&#x27;Juárez&#x27;,-106.42,31.69),(&#x27;Mérida&#x27;,-89.62,20.97),(&#x27;Chihuahua&#x27;,-106.09,28.63),(&#x27;Culiacán&#x27;,-107.39,24.8),(&#x27;Acapulco&#x27;,-99.82,16.86),(&#x27;Cancún&#x27;,-86.85,21.16)]),
+ &#x27;brazil&#x27;:dict(title=&#x27;Brazil&#x27;,kontur=[&#x27;BR&#x27;],bnd=(&#x27;ne0&#x27;,[&#x27;Brazil&#x27;]),national=True,bbox=(-74.5,-34,-34,5.5),credit=&#x27;Natural Earth 1:10m (Atlantic islands omitted)&#x27;,
+   cities=[(&#x27;São Paulo&#x27;,-46.63,-23.55),(&#x27;Rio de Janeiro&#x27;,-43.2,-22.9),(&#x27;Belo Horizonte&#x27;,-43.94,-19.92),(&#x27;Brasília&#x27;,-47.88,-15.79),(&#x27;Salvador&#x27;,-38.5,-12.97),(&#x27;Fortaleza&#x27;,-38.54,-3.72),(&#x27;Recife&#x27;,-34.88,-8.05),(&#x27;Porto Alegre&#x27;,-51.23,-30.03),(&#x27;Curitiba&#x27;,-49.27,-25.43),(&#x27;Manaus&#x27;,-60.02,-3.12),(&#x27;Belém&#x27;,-48.5,-1.46),(&#x27;Goiânia&#x27;,-49.25,-16.68)]),
+ &#x27;australia&#x27;:dict(title=&#x27;Australia&#x27;,kontur=[&#x27;AU&#x27;],bnd=(&#x27;ne0&#x27;,[&#x27;Australia&#x27;]),national=True,bbox=(112,-44,154,-9),credit=&#x27;Natural Earth 1:10m (external territories omitted)&#x27;,
+   cities=[(&#x27;Sydney&#x27;,151.21,-33.87),(&#x27;Melbourne&#x27;,144.96,-37.81),(&#x27;Brisbane&#x27;,153.03,-27.47),(&#x27;Perth&#x27;,115.86,-31.95),(&#x27;Adelaide&#x27;,138.6,-34.93),(&#x27;Canberra&#x27;,149.13,-35.28),(&#x27;Hobart&#x27;,147.33,-42.88),(&#x27;Darwin&#x27;,130.84,-12.46),(&#x27;Townsville&#x27;,146.82,-19.26),(&#x27;Cairns&#x27;,145.77,-16.92),(&#x27;Alice Springs&#x27;,133.88,-23.7),(&#x27;Newcastle&#x27;,151.78,-32.93)]),
+ &#x27;egypt&#x27;:dict(title=&#x27;Egypt&#x27;,kontur=[&#x27;EG&#x27;],bnd=(&#x27;ne0&#x27;,[&#x27;Egypt&#x27;]),national=True,top=0.55,credit=&#x27;Natural Earth 1:10m (de facto boundaries)&#x27;,
+   cities=[(&#x27;Cairo&#x27;,31.24,30.04),(&#x27;Alexandria&#x27;,29.92,31.2),(&#x27;Port Said&#x27;,32.3,31.26),(&#x27;Suez&#x27;,32.55,29.97),(&#x27;Mansoura&#x27;,31.38,31.04),(&#x27;Tanta&#x27;,31.0,30.79),(&#x27;Asyut&#x27;,31.18,27.18),(&#x27;Luxor&#x27;,32.64,25.69),(&#x27;Aswan&#x27;,32.9,24.09),(&#x27;Hurghada&#x27;,33.81,27.26),(&#x27;Siwa&#x27;,25.52,29.2),(&#x27;Marsa Matruh&#x27;,27.24,31.35)]),
 }
 </pre></div></details>
   <details><summary>pipeline/prep.py<span>clip, aggregate, project, join elections · <a href="https://github.com/stamen/prompted-population-maps/blob/main/pipeline/prep.py" target="_blank" rel="noopener">on GitHub</a></span></summary><div class="codebox"><button class="copy" type="button">Copy</button><pre>import sys, numpy as np, pandas as pd, pyogrio, h3, geopandas as gpd, shapely, time
@@ -591,7 +621,7 @@ so.rotation_euler=Vector((math.sin(az)*math.cos(el),math.cos(az)*math.cos(el),ma
 w=bpy.data.worlds.new(&#x27;w&#x27;); s.world=w; w.use_nodes=True
 w.node_tree.nodes[&#x27;Background&#x27;].inputs[&#x27;Color&#x27;].default_value=(0.55,0.65,0.85,1); w.node_tree.nodes[&#x27;Background&#x27;].inputs[&#x27;Strength&#x27;].default_value=0.35
 # ---- plan-oblique frame: margins for shadows (east), title (top) and credits (bottom)
-fx0,fx1,fy0,fy1=x0-0.03*S,x1+0.13*S,y0-0.12*S,y1+0.22*S
+fx0,fx1,fy0,fy1=x0-0.03*S,x1+0.13*S,y0-0.12*S,y1+c.get(&#x27;top&#x27;,0.22)*S   # &#x27;top&#x27;: extra headroom when tall spikes sit on the northern edge
 FW,FH=fx1-fx0,fy1-fy0; HPX=int(round(WPX*FH/FW))
 if HPX&gt;int(WPX*1.4): WPX=int(round(WPX*1.4*FW/FH)); HPX=int(round(WPX*FH/FW))   # cap very tall frames
 tilt=math.radians(50); D=4*S
@@ -850,6 +880,8 @@ print(f&quot;254 counties  D {t.d.sum():,.0f}  R {t.r.sum():,.0f}  total {t.tot.
   </ul>
   <p class="col muted small">Together they show why faking stays tempting: the look is the easy part to imitate, and the errors only show up when you check the geography, the numbers, and the text against a real source.</p>
 </section>
+
+
 </div>
 <script>
 document.querySelectorAll('.copy').forEach(function(b){

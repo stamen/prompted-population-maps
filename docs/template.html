@@ -82,6 +82,7 @@ details[open] summary{border-bottom:1px solid var(--rule)}
 .card.b{border-top-color:var(--blue)}
 .card p{font-size:.93rem}
 .intro{margin:0;border-left:3px solid var(--red);padding:4px 0 4px 24px;display:flex;flex-direction:column;gap:16px;max-width:68ch;font-style:italic;font-size:1.05rem}
+.intro em{font-style:normal}
 .intro cite{font-style:normal;font:500 .8rem var(--f-mono);letter-spacing:.06em;color:var(--muted)}
 .prompt{border:1px solid var(--rule);border-radius:4px;background:var(--plate);padding:16px;display:flex;flex-direction:column;gap:10px;position:relative}
 .prompt pre{white-space:pre-wrap}
@@ -134,6 +135,19 @@ details[open] summary{border-bottom:1px solid var(--rule)}
   <div class="gallery">
 <!--GALLERY-->
   </div>
+</section>
+
+<section class="stack" style="gap:20px">
+  <div class="stack col">
+    <span class="eyebrow">In the author's words</span>
+    <h2>Why these maps, and why these colors?</h2>
+  </div>
+  <blockquote class="intro">
+    <p>Why these specific maps? I chose these states and countries just to reproduce the <a href="https://www.threads.com/share/BAcMhPxj1t">AI-generated fake-data versions I saw online</a>. But you could create your own by following the instructions further down in this post.</p>
+    <p>And why these colors? The original post I saw was a map of Texas using this color scheme, so I decided to stick with it. I wouldn’t have picked this red-white-and-blue scheme myself, but possibly it was meant to evoke the Texas flag or the US flag. But since the map was also posted shortly after the 2026 midterm elections, it’s also probably meant to add to the “land doesn’t vote” narrative, showing how “blue” Democratic votes are concentrated in cities and “red” Republican votes tend to be in low-density rural areas. To be honest, using this color scheme on a map like this around the election makes me a bit uncomfortable: it feels like we’re trying to make an election map but without using real data. Will people incorrectly interpret these previous maps as election results?</p>
+    <p>So, I was curious if we <em>could</em> color these with election results instead? Here is one using county-level results from the 2026 Senate election (precinct-level results are not available yet) and another with the 2024 presidential results to see what finer-grained precinct-level results will look like. The maps are certainly more complex and messy, but that’s what the real world is like:</p>
+    <cite>— Alan McConchie</cite>
+  </blockquote>
 </section>
 
 <section class="stack" style="gap:28px">
@@ -303,6 +317,7 @@ python docs/build_site.py              # refresh this site</pre>
   <p class="col muted small">Together they show why faking stays tempting: the look is the easy part to imitate, and the errors only show up when you check the geography, the numbers, and the text against a real source.</p>
 </section>
 
+<!--REAL7_START-->
 <section class="stack" style="gap:28px">
   <div class="stack col">
     <span class="eyebrow">Back to real data</span>
@@ -320,6 +335,7 @@ python docs/build_site.py              # refresh this site</pre>
   </ul>
   <p class="col muted small">Totals match official figures within about 2%, except Brazil and Egypt, where Kontur's totals (216 and 113 million) follow UN 2023 estimates rather than national counts (Brazil's 2022 census found 203 million; Egypt's statistics agency reported about 105 million in 2023). The contiguous US map omits Alaska, Hawaii, and the territories, and the Russia map omits the part of Chukotka east of 180°.</p>
 </section>
+<!--REAL7_END-->
 </div>
 <script>
 document.querySelectorAll('.copy').forEach(function(b){
