@@ -701,12 +701,14 @@ for name,ex,ey in cities_xy:
     m=np.where((CX-ex)**2+(CY-ey)**2&lt;rad**2)[0]
     if len(m)==0: print(&#x27;no cells near&#x27;,name); continue
     sky=np.sort(h[m])[-min(25,len(m))]; j=m[np.argmin(np.abs(h[m]-sky))]
-    v=world_to_camera_view(s,co,Vector((CX[j],CY[j],h[j]))); lab.append((name,v.x*WPX,(1-v.y)*HPX))
+    # label sits at the city&#x27;s own coordinates, raised to its visible skyline height
+    v=world_to_camera_view(s,co,Vector((ex,ey,h[j]))); lab.append((name,v.x*WPX,(1-v.y)*HPX))
 parts_lab=[]
 for name,px_,py_ in (d[&#x27;part_xy&#x27;] if &#x27;part_xy&#x27; in d.files else []):   # caption under each moved part of a composite map
     v=world_to_camera_view(s,co,Vector((px_,py_,0))); parts_lab.append((name,v.x*WPX,(1-v.y)*HPX))
 meta=dict(parts=parts_lab,labels=lab,cells=int(n),res=int(d[&#x27;res&#x27;]),cell_km2=float(np.median(d[&#x27;area&#x27;])),pop=float(d[&#x27;pop&#x27;].sum()))
 json.dump(meta,open(OUT.rsplit(&#x27;.&#x27;,1)[0]+&#x27;_meta.json&#x27;,&#x27;w&#x27;))
+if os.environ.get(&#x27;POPMAPS_LABELS_ONLY&#x27;): sys.exit(0)   # recompute label anchors without rendering
 s.render.engine=&#x27;CYCLES&#x27;; s.cycles.device=&#x27;CPU&#x27;; s.cycles.samples=SPP; s.cycles.use_denoising=True; s.cycles.max_bounces=4
 s.view_settings.view_transform=&#x27;AgX&#x27;; s.view_settings.look=&#x27;AgX - Medium High Contrast&#x27;
 s.render.image_settings.file_format=&#x27;PNG&#x27;; s.render.filepath=OUT
@@ -797,10 +799,14 @@ ov=Image.new(&#x27;RGBA&#x27;,im.size,(0,0,0,0)); do=ImageDraw.Draw(ov); texts=[
 capH=fN.getbbox(&#x27;H&#x27;)[3]-fN.getbbox(&#x27;H&#x27;)[1]; padx,pady=fN.size*0.55,fN.size*0.42
 for name,px,py in meta[&#x27;labels&#x27;]:
     l_,t_,r_,b_=fN.getbbox(name,anchor=&#x27;ls&#x27;); w=r_-l_; bw,bh=w+2*padx,capH+2*pady
-    for dx,dy in [(0,0),(0.55,0),(-0.55,0),(0,-1.1)]:
+    # Nudges never move a label off its spike: straight up (one or two steps) first, then sideways by less than half the pill&#x27;s
+    # width (so the pill still covers its anchor), then both. If nothing fits, the label is dropped, not misplaced.
+    for dx,dy in [(0,0),(0,-1.1),(0,-2.2),(0.3,0),(-0.3,0),(0.3,-1.1),(-0.3,-1.1)]:
         x=px-bw/2+dx*bw; y=py-U*0.010-bh+dy*bh; b=(x-3,y-3,x+bw+3,y+bh+3)
         if not hit(b): break
-    else: continue
+    else:
+        print(f&#x27;  label dropped (no room): {name}&#x27;); continue
+    if (dx,dy)!=(0,0): print(f&#x27;  label nudged {&quot;up&quot; if dy else &quot;&quot;}{&quot; &quot; if dx and dy else &quot;&quot;}{&quot;right&quot; if dx&gt;0 else &quot;left&quot; if dx&lt;0 else &quot;&quot;}: {name}&#x27;)
     taken.append(b)
     do.rounded_rectangle([x+U*0.0012,y+U*0.0018,x+bw+U*0.0012,y+bh+U*0.0018],radius=bh/2,fill=(40,28,18,55))   # soft drop shadow
     do.rounded_rectangle([x,y,x+bw,y+bh],radius=bh/2,fill=(*cream,232),outline=(150,128,104,200),width=max(1,int(U/1400)))
